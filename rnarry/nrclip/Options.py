@@ -1,4 +1,7 @@
-#!/usr/bin/env python
+#
+# rnarry.nrclip.Options
+#  - Options and parameters
+#
 #
 # Copyright (C) 2012 Hyeshik Chang
 #
@@ -21,19 +24,34 @@
 # OTHER DEALINGS IN THE SOFTWARE.
 #
 
-from ruffus import *
-from rnarry.nrclip import DataPreparation, SequenceProcessing
-from rnarry.nrclip import Options
-from itertools import chain
 
-task_modules = [
-    DataPreparation,
-    SequenceProcessing,
-]
+# ================================
+# Project-specific configurations
 
-all_tasks = list(chain(*[mod.tasks() for mod in task_modules]))
+NUM_PARALLEL = 8
 
-pipeline_run(all_tasks, verbose=5, multiprocess=Options.NUM_PARALLEL)
-#pipeline_printout_graph('flowchart.jpg', 'jpg', all_tasks)
+GENOME = 'mm9'
+CLIP_SAMPLES = ['CLIP-35L33G', 'CLIP-2J3', 'CLIP-46020']
+CLIPCTL_SAMPLES = ['PolyA-None-rep1']
+RPF_SAMPLES = ['RPF-Luc-rep1', 'RPF-Lin28a-rep1']
+RPFCTL_SAMPLES = ['PolyA-Luc-rep1', 'PolyA-Lin28a-rep1']
+ALL_SAMPLES = CLIP_SAMPLES + CLIPCTL_SAMPLES + RPF_SAMPLES + RPFCTL_SAMPLES
 
-# ex: ts=8 sts=4 sw=4 et
+modban_illumina = 'CTGTAGGCACCATCAATTCGTATGCCGTCTTCTGCTTG'
+illumina_SRA15 = 'ATCTCGTATGCCGTCTTCTGCTTG'
+ADAPTER_SEQ = {
+    'CLIP-35L33G': modban_illumina,
+    'CLIP-2J3': modban_illumina,
+    'CLIP-46020': modban_illumina,
+    'PolyA-None-rep1': modban_illumina,
+    'RPF-Luc-rep1': illumina_SRA15,
+    'RPF-Lin28a-rep1': illumina_SRA15,
+    'PolyA-Luc-rep1': illumina_SRA15,
+    'PolyA-Lin28a-rep1': illumina_SRA15,
+}
+
+# fastx toolkit settings
+FULLTAG_MIN_LENGTH = 20
+FULLTAG_MIN_QUALITY = 25
+FULLTAG_MIN_QUALITY_PERCENT = 90
+

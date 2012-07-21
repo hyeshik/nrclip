@@ -36,7 +36,6 @@ def generate_gsnap_early_filter_index(inputfile, outcheck):
             '-D $EXTERNAL_DIR $inputfile')
 
 
-GENOME_SEQ_URL = 'http://hgdownload.cse.ucsc.edu/goldenPath/mm9/bigZips/chromFa.tar.gz'
 @files(None, Paths.genome_fasta_zipped)
 def download_zipped_genome_sequence(inputfile, outputfile):
     runproc('$WGET_CMD -O $outputfile $GENOME_SEQ_URL')

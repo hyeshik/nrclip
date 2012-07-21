@@ -44,7 +44,7 @@ def runproc(origcmd, ignore_error=False):
     tmplvalues = Paths.__dict__.copy()
     tmplvalues.update(callerframe[0].f_globals)
     tmplvalues.update(callerframe[0].f_locals)
-    command = cmdtemplate.substitute(tmplvalues)
+    command = cmdtemplate.substitute(tmplvalues).strip()
 
     ret = os.system(command)
 

@@ -25,11 +25,16 @@
 #
 
 import os
+from rnarry.nrclip.Options import *
+
 
 TOPDIR = os.getcwd()
 
 def rel(path):
     return os.path.join(TOPDIR, path)
+
+def relfmt(path):
+    return lambda *v: os.path.join(TOPDIR, path % tuple(v))
 
 
 # =================================
@@ -39,12 +44,23 @@ GSNAP_CMD = 'gsnap'
 GMAP_BUILD_CMD = 'gmap_build'
 WGET_CMD = 'wget'
 TAR_CMD = 'tar'
+ZCAT_CMD = 'zcat'
+FASTX_CLIPPER_CMD = 'fastx_clipper'
+FASTQ_QUALITY_TRIMMER_CMD = 'fastq_quality_trimmer'
+FASTQ_QUALITY_FILTER_CMD = 'fastq_quality_filter'
+
+
+# =================================
+# External resource URLs
+
+GENOME_SEQ_URL = 'http://hgdownload.cse.ucsc.edu/goldenPath/%s/bigZips/chromFa.tar.gz' % GENOME
 
 
 # ==============
 # Subdirectories
 
 EXTERNAL_DIR = 'external'
+ORIGREAD_DIR = 'sequences'
 TMP_DIR = 'tmp'
 
 
@@ -55,10 +71,17 @@ early_filter_prefix = 'early-filter'
 early_filter_fasta = rel('%s/%s.fa' % (EXTERNAL_DIR, early_filter_prefix))
 early_filter_index_check = rel('%s/%s/%s.ref153positions' % (
                     EXTERNAL_DIR, early_filter_prefix, early_filter_prefix))
-genome_prefix = 'mm9'
+genome_prefix = GENOME
 genome_fasta = rel('%s/%s.fa' % (EXTERNAL_DIR, genome_prefix))
-genome_index_check = rel('%s/%s/%s.ref12123positions' % (
+genome_index_check = rel('%s/%s/%s.ref123positions' % (
                          EXTERNAL_DIR, genome_prefix, genome_prefix))
 genome_fasta_zipped = rel('%s/%s.tar.gz' % (EXTERNAL_DIR, genome_prefix))
 
+
+# =========================
+# Basic sequence processing
+
+original_sequence_reads = relfmt(ORIGREAD_DIR + '/%s.fq.gz')
+fulltag_quality_filtered_reads = relfmt(ORIGREAD_DIR + '/%s-hq.fq.gz')
+fulltag_collapsed_reads = relfmt(ORIGREAD_DIR + '/%s-total.fa')
 
