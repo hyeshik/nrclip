@@ -26,18 +26,44 @@
 
 import os
 import inspect
+import string
+import tempfile
+import shutil
 
-__all__ = ['runproc']
+from rnarry.nrclip import Paths
+
+__all__ = ['runproc', 'ExternalProcessError', 'TemporaryDirectory']
 
 class ExternalProcessError(Exception):
     pass
 
-def runproc(command, ignore_error=False):
+def runproc(origcmd, ignore_error=False):
+    callerframe = inspect.getouterframes(inspect.currentframe())[1]
+
+    cmdtemplate = string.Template(origcmd)
+    tmplvalues = Paths.__dict__.copy()
+    tmplvalues.update(callerframe[0].f_globals)
+    tmplvalues.update(callerframe[0].f_locals)
+    command = cmdtemplate.substitute(tmplvalues)
+
     ret = os.system(command)
+
     if ret != 0:
-        curframe = inspect.currentframe()
-        referer = inspect.getouterframes(curframe)[1][3]
         raise ExternalProcessError(
                 "[%s] Process returned %d while running command %s" %
-                (referer, ret, repr(command)))
+                (callerframe[3], ret, repr(command)))
+
+
+class TemporaryDirectory(object):
+    def __init__(self, dir=Paths.TMP_DIR):
+        self.dir = dir
+        self.path = None
+
+    def __enter__(self):
+        self.path = tempfile.mkdtemp(dir=self.dir)
+        return self.path
+
+    def __exit__(self, type, value, traceback):
+        if self.path is not None:
+            shutil.rmtree(self.path)
 

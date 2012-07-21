@@ -31,6 +31,6 @@ task_modules = [
 
 all_tasks = list(chain(*[mod.tasks() for mod in task_modules]))
 
-pipeline_run(all_tasks, verbose=1)
+pipeline_run(all_tasks, verbose=2)
 
 # ex: ts=8 sts=4 sw=4 et
