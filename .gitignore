@@ -1,0 +1,5 @@
+*.swp
+*.pyc
+external/early-filter/*
+external/mm9.fa
+external/mm9.tar.gz
