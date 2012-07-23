@@ -35,11 +35,11 @@ from rnarry.nrclip.PipelineControl import *
 def fulltag_filter_clip_trim(inputfile, outputfile, sample):
     adapter = Options.ADAPTER_SEQ[sample]
     runproc("""
-        $ZCAT_CMD $inputfile | \
-        $FASTX_CLIPPER_CMD -n -a $adapter -l $FULLTAG_MIN_LENGTH | \
-        $FASTQ_QUALITY_TRIMMER_CMD -t $FULLTAG_MIN_QUALITY \
+        $ZCAT $inputfile | \
+        $FASTX_CLIPPER -n -a $adapter -l $FULLTAG_MIN_LENGTH | \
+        $FASTQ_QUALITY_TRIMMER -t $FULLTAG_MIN_QUALITY \
             -l $FULLTAG_MIN_LENGTH | \
-        $FASTQ_QUALITY_FILTER_CMD -q $FULLTAG_MIN_QUALITY \
+        $FASTQ_QUALITY_FILTER -q $FULLTAG_MIN_QUALITY \
             -p $FULLTAG_MIN_QUALITY_PERCENT -z -o $outputfile""")
 
 
@@ -49,9 +49,9 @@ def fulltag_filter_clip_trim(inputfile, outputfile, sample):
 @follows(fulltag_filter_clip_trim)
 def fulltag_collapse(inputfile, outputfile, sample):
     runproc("""
-        $ZCAT_CMD $inputfile | \
-        $FASTX_COLLAPSER_CMD | \
-        $FASTX_ARTIFACTS_FILTER_CMD -o $outputfile""")
+        $ZCAT $inputfile | \
+        $FASTX_COLLAPSER | \
+        $FASTX_ARTIFACTS_FILTER -o $outputfile""")
 
 
 @files(for_each_sample(Paths.original_sequence_reads,
@@ -59,12 +59,12 @@ def fulltag_collapse(inputfile, outputfile, sample):
                        Paths.SHORTTAG_SAMPLES))
 def shorttag_trim_collapse(inputfile, outputfile, sample):
     runproc("""
-        $ZCAT_CMD $inputfile | \
-        $FASTX_TRIMMER_CMD -f 1 -l $SHORTTAG_LENGTH | \
-        $FASTQ_QUALITY_FILTER_CMD -q $SHORTTAG_MIN_QUALITY \
+        $ZCAT $inputfile | \
+        $FASTX_TRIMMER -f 1 -l $SHORTTAG_LENGTH | \
+        $FASTQ_QUALITY_FILTER -q $SHORTTAG_MIN_QUALITY \
             -p $SHORTTAG_MIN_QUALITY_PERCENT | \
-        $FASTX_COLLAPSER_CMD | \
-        $FASTX_ARTIFACTS_FILTER_CMD -o $outputfile""")
+        $FASTX_COLLAPSER | \
+        $FASTX_ARTIFACTS_FILTER -o $outputfile""")
 
 
 def tasks():

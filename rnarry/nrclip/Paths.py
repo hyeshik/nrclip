@@ -37,20 +37,32 @@ def relfmt(path):
     return lambda *v: os.path.join(TOPDIR, path % tuple(v))
 
 
-# =================================
-# Configurations for external tools
+# =====================
+# External tool aliases
 
-GSNAP_CMD = 'gsnap'
-GMAP_BUILD_CMD = 'gmap_build'
-WGET_CMD = 'wget'
-TAR_CMD = 'tar'
-ZCAT_CMD = 'zcat'
-FASTX_CLIPPER_CMD = 'fastx_clipper'
-FASTQ_QUALITY_TRIMMER_CMD = 'fastq_quality_trimmer'
-FASTQ_QUALITY_FILTER_CMD = 'fastq_quality_filter'
-FASTX_COLLAPSER_CMD = 'fastx_collapser'
-FASTX_TRIMMER_CMD = 'fastx_trimmer'
-FASTX_ARTIFACTS_FILTER_CMD = 'fastx_artifacts_filter'
+#- Generic UNIX command line tools
+AWK = 'awk'
+CUT = 'cut'
+GREP = 'grep'
+GZIP = 'pigz'
+SORT = 'sort'
+TAR = 'tar'
+UNIQ = 'uniq'
+WGET = 'wget'
+ZCAT = 'zcat'
+
+#- A. Gordon's FASTX_Toolkit
+FASTX_CLIPPER = 'fastx_clipper'
+FASTQ_QUALITY_TRIMMER = 'fastq_quality_trimmer'
+FASTQ_QUALITY_FILTER = 'fastq_quality_filter'
+FASTX_COLLAPSER = 'fastx_collapser'
+FASTX_TRIMMER = 'fastx_trimmer'
+FASTX_ARTIFACTS_FILTER = 'fastx_artifacts_filter'
+
+#- Bioinformatic tools
+GSNAP = 'gsnap' # from gmap/gsnap
+GMAP_BUILD = 'gmap_build' # from gmap/gsnap
+FASOMERECORDS = 'faSomeRecords' # from Jim Kent's ucscgb
 
 
 # =================================
@@ -64,6 +76,7 @@ GENOME_SEQ_URL = 'http://hgdownload.cse.ucsc.edu/goldenPath/%s/bigZips/chromFa.t
 
 EXTERNAL_DIR = 'external'
 ORIGREAD_DIR = 'sequences'
+PREALN_DIR = 'prealns'
 TMP_DIR = 'tmp'
 
 
@@ -89,4 +102,14 @@ fulltag_quality_filtered_reads = relfmt(ORIGREAD_DIR + '/%s-hq.fq.gz')
 fulltag_collapsed_reads = relfmt(ORIGREAD_DIR + '/%s-total.fa')
 shorttag_trimmed_reads = relfmt(ORIGREAD_DIR + '/%s-trimmed.fq.gz')
 shorttag_tags = relfmt(ORIGREAD_DIR + '/%s-tags.fa')
+
+
+# ==================
+# Contaminant filter
+
+fulltag_prealn_sam = relfmt(PREALN_DIR + '/full-%s.sam.gz')
+shorttag_prealn_sam = relfmt(PREALN_DIR + '/short-%s.sam.gz')
+
+fulltag_filtered_reads = relfmt(PREALN_DIR + '/full-%s-clean.fa')
+shorttag_filtered_reads = relfmt(PREALN_DIR + '/short-%s-clean.fa')
 

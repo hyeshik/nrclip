@@ -32,27 +32,27 @@ from rnarry.nrclip.PipelineControl import *
 
 @files(Paths.early_filter_fasta, Paths.early_filter_index_check)
 def generate_gsnap_early_filter_index(inputfile, outcheck):
-    runproc('$GMAP_BUILD_CMD -d $early_filter_prefix '
+    runproc('$GMAP_BUILD -d $early_filter_prefix '
             '-D $EXTERNAL_DIR $inputfile')
 
 
 @files(None, Paths.genome_fasta_zipped)
 def download_zipped_genome_sequence(inputfile, outputfile):
-    runproc('$WGET_CMD -O $outputfile $GENOME_SEQ_URL')
+    runproc('$WGET -O $outputfile $GENOME_SEQ_URL')
 
 
 @files(Paths.genome_fasta_zipped, Paths.genome_fasta)
 @follows(download_zipped_genome_sequence)
 def extract_genome_sequence(inputfile, outputfile):
     with TemporaryDirectory() as tdir:
-        runproc('$TAR_CMD -C $tdir -xzf $inputfile')
+        runproc('$TAR -C $tdir -xzf $inputfile')
         runproc('cd $tdir && cat *.fa > $outputfile')
 
 
 @files(Paths.genome_fasta, Paths.genome_index_check)
 @follows(extract_genome_sequence)
 def generate_gsnap_genome_index(inputfile, outcheck):
-    runproc('$GMAP_BUILD_CMD -d $genome_prefix -D $EXTERNAL_DIR -k 12 '
+    runproc('$GMAP_BUILD -d $genome_prefix -D $EXTERNAL_DIR -k 12 '
             '$inputfile')
 
 

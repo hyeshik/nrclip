@@ -23,12 +23,14 @@
 
 from ruffus import *
 from rnarry.nrclip import DataPreparation, SequenceProcessing
+from rnarry.nrclip import ContaminantFilter
 from rnarry.nrclip import Options
 from itertools import chain
 
 task_modules = [
     DataPreparation,
     SequenceProcessing,
+    ContaminantFilter,
 ]
 
 all_tasks = list(chain(*[mod.tasks() for mod in task_modules]))

@@ -33,7 +33,7 @@ import shutil
 from rnarry.nrclip import Paths
 
 __all__ = ['runproc', 'ExternalProcessError', 'TemporaryDirectory',
-           'for_each_sample']
+           'TemporaryFile', 'for_each_sample']
 
 class ExternalProcessError(Exception):
     pass
@@ -68,7 +68,26 @@ class TemporaryDirectory(object):
         if self.path is not None:
             shutil.rmtree(self.path)
 
+class TemporaryFile(object):
+    def __init__(self, dir=Paths.TMP_DIR):
+        self.dir = dir
+        self.path = None
+
+    def __enter__(self):
+        self.path = tempfile.mkstemp(dir=self.dir)[1]
+        return self.path
+
+    def __exit__(self, type, value, traceback):
+        if self.path is not None and os.path.exists(self.path):
+            os.unlink(self.path)
+
 def for_each_sample(inputpat, outputpat, samples):
-    return [[inputpat(sample), outputpat(sample), sample]
+    def instantiate(pat, sample):
+        if callable(pat):
+            return pat(sample)
+        return [p(sample) for p in pat]
+
+    return [[instantiate(inputpat, sample),
+             instantiate(outputpat, sample), sample]
             for sample in samples]
 
