@@ -25,7 +25,7 @@
 #
 
 from ruffus import *
-from rnarry.nrclip import Paths, Options, SequenceProcessing
+from rnarry.nrclip import Paths, Options, SequenceProcessing, DataPreparation
 from rnarry.nrclip.PipelineControl import *
 
 
@@ -33,6 +33,7 @@ from rnarry.nrclip.PipelineControl import *
                        Paths.fulltag_prealn_sam,
                        Paths.ALL_SAMPLES))
 @follows(SequenceProcessing.fulltag_collapse)
+@follows(DataPreparation.generate_gsnap_early_filter_index)
 @jobs_limit(1, 'exclusive')
 def fulltag_contaminant_alignment(inputfile, outputfile, sample):
     runproc("""
@@ -45,6 +46,7 @@ def fulltag_contaminant_alignment(inputfile, outputfile, sample):
                        Paths.shorttag_prealn_sam,
                        Paths.SHORTTAG_SAMPLES))
 @follows(SequenceProcessing.shorttag_trim_collapse)
+@follows(DataPreparation.generate_gsnap_early_filter_index)
 @jobs_limit(1, 'exclusive')
 def shorttag_contaminant_alignment(inputfile, outputfile, sample):
     runproc("""

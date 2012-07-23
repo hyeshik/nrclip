@@ -34,7 +34,7 @@ from ruffus.task import task_decorator
 from rnarry.nrclip import Paths
 
 __all__ = ['runproc', 'ExternalProcessError', 'TemporaryDirectory',
-           'TemporaryFile', 'for_each_sample']
+           'TemporaryFile', 'DeleteOnError', 'for_each_sample']
 
 class ExternalProcessError(Exception):
     pass
@@ -88,6 +88,17 @@ class TemporaryFile(object):
 
     def __exit__(self, type, value, traceback):
         if self.path is not None and os.path.exists(self.path):
+            os.unlink(self.path)
+
+class DeleteOnError(object):
+    def __init__(self, path):
+        self.path = path
+
+    def __enter__(self):
+        return open(self.path, 'w')
+
+    def __exit__(self, type, value, traceback):
+        if type is not None and os.path.exists(self.path):
             os.unlink(self.path)
 
 def for_each_sample(inputpat, outputpat, samples):

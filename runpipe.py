@@ -37,6 +37,11 @@ task_modules = [
 
 all_tasks = list(chain(*[mod.tasks() for mod in task_modules]))
 
+# Simplify module names in diagrams
+for task in all_tasks:
+    module = task.__module__.split('.')[-1]
+    task.pipeline_task.display_name = '%s.%s' % (module, task.__name__)
+
 pipeline_printout_graph('flowchart.pdf', 'pdf', all_tasks)
 pipeline_run(all_tasks, verbose=5, multiprocess=Options.NUM_PARALLEL)
 

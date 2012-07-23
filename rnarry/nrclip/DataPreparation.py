@@ -78,6 +78,24 @@ def build_splicesites_index(inputfiles, outputfile):
         $IIT_STORE -o $outputfile""", outputfile)
 
 
+@files(None, Paths.mirbase_catalog)
+def download_mirbase_catalog(inputfile, outputfile):
+    import urllib, re
+
+    accession_pat = re.compile('ACC.*ID="([^"]*)";')
+
+    with DeleteOnError(outputfile) as output:
+        for line in urllib.urlopen(Paths.MIRBASE_URL):
+            if line.startswith('#'):
+                continue
+            fields = line.rstrip().split('\t')
+            name = accession_pat.findall(fields[8])[0]
+            print >> output, '\t'.join([
+                'chr'+fields[0], str(int(fields[3])-1), fields[4],
+                name, '.', fields[6]
+            ])
+
+
 def tasks():
     return [
         generate_gsnap_early_filter_index,
@@ -87,4 +105,5 @@ def tasks():
         download_refgene,
         download_knowngene,
         build_splicesites_index,
+        download_mirbase_catalog,
     ]

@@ -77,6 +77,7 @@ SAM_MULTIHIT_RESOLVE = 'python scripts/sam-multihit-resolve.py'
 GENOME_SEQ_URL = 'http://hgdownload.cse.ucsc.edu/goldenPath/%s/bigZips/chromFa.tar.gz' % GENOME
 REFGENE_URL = 'ftp://hgdownload.cse.ucsc.edu/goldenPath/%s/database/refGene.txt.gz' % GENOME
 KNOWNGENE_URL = 'ftp://hgdownload.cse.ucsc.edu/goldenPath/%s/database/knownGene.txt.gz' % GENOME
+MIRBASE_URL = 'ftp://mirbase.org/pub/mirbase/18/genomes/mmu.gff2'
 
 
 # ==============
@@ -105,6 +106,8 @@ refgene_ucsc = rel(EXTERNAL_DIR + '/refGene.txt.gz')
 knowngene_ucsc = rel(EXTERNAL_DIR + '/knownGene.txt.gz')
 splice_index = rel(EXTERNAL_DIR + '/%s/%s.maps/%s.splicesites.iit' % (
                     genome_prefix, genome_prefix, genome_prefix))
+
+mirbase_catalog = rel(EXTERNAL_DIR + '/mirbase.bed')
 
 
 # =========================
