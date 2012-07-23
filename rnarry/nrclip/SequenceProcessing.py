@@ -37,10 +37,10 @@ from rnarry.nrclip.PipelineControl import *
 def fulltag_filter_clip_trim(inputfile, outputfile, sample):
     adapter = Options.ADAPTER_SEQ[sample]
     runproc("""
-        $ZCAT_CMD $inputfile |
-        $FASTX_CLIPPER_CMD -n -a $adapter -l $FULLTAG_MIN_LENGTH |
-        $FASTQ_QUALITY_TRIMMER_CMD -t $FULLTAG_MIN_QUALITY -l $FULLTAG_MIN_LENGTH |
-        $FASTQ_QUALITY_FILTER_CMD -q $FULLTAG_MIN_QUALITY_PERCENT -z -o $outputfile""")
+        $ZCAT_CMD $inputfile | \
+        $FASTX_CLIPPER_CMD -n -a $adapter -l $FULLTAG_MIN_LENGTH | \
+        $FASTQ_QUALITY_TRIMMER_CMD -t $FULLTAG_MIN_QUALITY -l $FULLTAG_MIN_LENGTH | \
+        $FASTQ_QUALITY_FILTER_CMD -q $FULLTAG_MIN_QUALITY -p $FULLTAG_MIN_QUALITY_PERCENT -z -o $outputfile""")
 
 def tasks():
     return [
