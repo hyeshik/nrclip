@@ -33,7 +33,7 @@ task_modules = [
 
 all_tasks = list(chain(*[mod.tasks() for mod in task_modules]))
 
-pipeline_run(all_tasks, verbose=5, multiprocess=Options.NUM_PARALLEL)
 pipeline_printout_graph('flowchart.jpg', 'jpg', all_tasks)
+pipeline_run(all_tasks, verbose=5, multiprocess=Options.NUM_PARALLEL)
 
 # ex: ts=8 sts=4 sw=4 et

@@ -50,6 +50,7 @@ FASTQ_QUALITY_TRIMMER_CMD = 'fastq_quality_trimmer'
 FASTQ_QUALITY_FILTER_CMD = 'fastq_quality_filter'
 FASTX_COLLAPSER_CMD = 'fastx_collapser'
 FASTX_TRIMMER_CMD = 'fastx_trimmer'
+FASTX_ARTIFACTS_FILTER_CMD = 'fastx_artifacts_filter'
 
 
 # =================================

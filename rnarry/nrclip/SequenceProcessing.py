@@ -50,35 +50,27 @@ def fulltag_filter_clip_trim(inputfile, outputfile, sample):
 def fulltag_collapse(inputfile, outputfile, sample):
     runproc("""
         $ZCAT_CMD $inputfile | \
-        $FASTX_COLLAPSER_CMD -o $outputfile""")
+        $FASTX_COLLAPSER_CMD | \
+        $FASTX_ARTIFACTS_FILTER_CMD -o $outputfile""")
 
 
 @files(for_each_sample(Paths.original_sequence_reads,
-                       Paths.shorttag_trimmed_reads,
-                       Paths.SHORTTAG_SAMPLES))
-def shorttag_trim(inputfile, outputfile, sample):
-    runproc("""
-        $ZCAT_CMD $inputfile | \
-        $FASTX_TRIMMER_CMD -f 1 -l $SHORTTAG_LENGTH -z -o $outputfile""")
-
-
-@files(for_each_sample(Paths.shorttag_trimmed_reads,
                        Paths.shorttag_tags,
                        Paths.SHORTTAG_SAMPLES))
-@follows(shorttag_trim)
-def shorttag_collapse(inputfile, outputfile, sample):
+def shorttag_trim_collapse(inputfile, outputfile, sample):
     runproc("""
         $ZCAT_CMD $inputfile | \
+        $FASTX_TRIMMER_CMD -f 1 -l $SHORTTAG_LENGTH | \
         $FASTQ_QUALITY_FILTER_CMD -q $SHORTTAG_MIN_QUALITY \
             -p $SHORTTAG_MIN_QUALITY_PERCENT | \
-        $FASTX_COLLAPSER_CMD -o $outputfile""")
+        $FASTX_COLLAPSER_CMD | \
+        $FASTX_ARTIFACTS_FILTER_CMD -o $outputfile""")
 
 
 def tasks():
     return [
         fulltag_filter_clip_trim,
         fulltag_collapse,
-        shorttag_trim,
-        shorttag_collapse,
+        shorttag_trim_collapse,
     ]
 
