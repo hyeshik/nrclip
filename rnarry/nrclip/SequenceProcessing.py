@@ -29,20 +29,56 @@ from rnarry.nrclip import Paths, Options
 from rnarry.nrclip.PipelineControl import *
 
 
-@files([
-    [Paths.original_sequence_reads(sample),
-     Paths.fulltag_quality_filtered_reads(sample),
-     sample]
-    for sample in Paths.ALL_SAMPLES])
+@files(for_each_sample(Paths.original_sequence_reads,
+                       Paths.fulltag_quality_filtered_reads,
+                       Paths.ALL_SAMPLES))
 def fulltag_filter_clip_trim(inputfile, outputfile, sample):
     adapter = Options.ADAPTER_SEQ[sample]
     runproc("""
         $ZCAT_CMD $inputfile | \
         $FASTX_CLIPPER_CMD -n -a $adapter -l $FULLTAG_MIN_LENGTH | \
-        $FASTQ_QUALITY_TRIMMER_CMD -t $FULLTAG_MIN_QUALITY -l $FULLTAG_MIN_LENGTH | \
-        $FASTQ_QUALITY_FILTER_CMD -q $FULLTAG_MIN_QUALITY -p $FULLTAG_MIN_QUALITY_PERCENT -z -o $outputfile""")
+        $FASTQ_QUALITY_TRIMMER_CMD -t $FULLTAG_MIN_QUALITY \
+            -l $FULLTAG_MIN_LENGTH | \
+        $FASTQ_QUALITY_FILTER_CMD -q $FULLTAG_MIN_QUALITY \
+            -p $FULLTAG_MIN_QUALITY_PERCENT -z -o $outputfile""")
+
+
+@files(for_each_sample(Paths.fulltag_quality_filtered_reads,
+                       Paths.fulltag_collapsed_reads,
+                       Paths.ALL_SAMPLES))
+@follows(fulltag_filter_clip_trim)
+def fulltag_collapse(inputfile, outputfile, sample):
+    runproc("""
+        $ZCAT_CMD $inputfile | \
+        $FASTX_COLLAPSER_CMD -o $outputfile""")
+
+
+@files(for_each_sample(Paths.original_sequence_reads,
+                       Paths.shorttag_trimmed_reads,
+                       Paths.SHORTTAG_SAMPLES))
+def shorttag_trim(inputfile, outputfile, sample):
+    runproc("""
+        $ZCAT_CMD $inputfile | \
+        $FASTX_TRIMMER_CMD -f 1 -l $SHORTTAG_LENGTH -z -o $outputfile""")
+
+
+@files(for_each_sample(Paths.shorttag_trimmed_reads,
+                       Paths.shorttag_tags,
+                       Paths.SHORTTAG_SAMPLES))
+@follows(shorttag_trim)
+def shorttag_collapse(inputfile, outputfile, sample):
+    runproc("""
+        $ZCAT_CMD $inputfile | \
+        $FASTQ_QUALITY_FILTER_CMD -q $SHORTTAG_MIN_QUALITY \
+            -p $SHORTTAG_MIN_QUALITY_PERCENT | \
+        $FASTX_COLLAPSER_CMD -o $outputfile""")
+
 
 def tasks():
     return [
         fulltag_filter_clip_trim,
+        fulltag_collapse,
+        shorttag_trim,
+        shorttag_collapse,
     ]
+

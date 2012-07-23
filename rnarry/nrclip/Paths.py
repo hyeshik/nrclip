@@ -48,6 +48,8 @@ ZCAT_CMD = 'zcat'
 FASTX_CLIPPER_CMD = 'fastx_clipper'
 FASTQ_QUALITY_TRIMMER_CMD = 'fastq_quality_trimmer'
 FASTQ_QUALITY_FILTER_CMD = 'fastq_quality_filter'
+FASTX_COLLAPSER_CMD = 'fastx_collapser'
+FASTX_TRIMMER_CMD = 'fastx_trimmer'
 
 
 # =================================
@@ -84,4 +86,6 @@ genome_fasta_zipped = rel('%s/%s.tar.gz' % (EXTERNAL_DIR, genome_prefix))
 original_sequence_reads = relfmt(ORIGREAD_DIR + '/%s.fq.gz')
 fulltag_quality_filtered_reads = relfmt(ORIGREAD_DIR + '/%s-hq.fq.gz')
 fulltag_collapsed_reads = relfmt(ORIGREAD_DIR + '/%s-total.fa')
+shorttag_trimmed_reads = relfmt(ORIGREAD_DIR + '/%s-trimmed.fq.gz')
+shorttag_tags = relfmt(ORIGREAD_DIR + '/%s-tags.fa')
 

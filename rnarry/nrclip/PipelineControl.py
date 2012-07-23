@@ -32,7 +32,8 @@ import shutil
 
 from rnarry.nrclip import Paths
 
-__all__ = ['runproc', 'ExternalProcessError', 'TemporaryDirectory']
+__all__ = ['runproc', 'ExternalProcessError', 'TemporaryDirectory',
+           'for_each_sample']
 
 class ExternalProcessError(Exception):
     pass
@@ -66,4 +67,8 @@ class TemporaryDirectory(object):
     def __exit__(self, type, value, traceback):
         if self.path is not None:
             shutil.rmtree(self.path)
+
+def for_each_sample(inputpat, outputpat, samples):
+    return [[inputpat(sample), outputpat(sample), sample]
+            for sample in samples]
 

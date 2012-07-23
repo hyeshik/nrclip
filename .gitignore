@@ -5,3 +5,6 @@ external/mm9/*
 external/mm9.fa
 external/mm9.tar.gz
 sequences/*-hq.fq.gz
+sequences/*-total.fa
+sequences/*-trimmed.fq.gz
+sequences/*-tags.fa
