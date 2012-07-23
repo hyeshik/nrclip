@@ -30,6 +30,7 @@ import string
 import tempfile
 import shutil
 
+from ruffus.task import task_decorator
 from rnarry.nrclip import Paths
 
 __all__ = ['runproc', 'ExternalProcessError', 'TemporaryDirectory',
@@ -38,7 +39,7 @@ __all__ = ['runproc', 'ExternalProcessError', 'TemporaryDirectory',
 class ExternalProcessError(Exception):
     pass
 
-def runproc(origcmd, ignore_error=False):
+def runproc(origcmd, delete_on_error=[], ignore_error=False):
     callerframe = inspect.getouterframes(inspect.currentframe())[1]
 
     cmdtemplate = string.Template(origcmd)
@@ -49,7 +50,16 @@ def runproc(origcmd, ignore_error=False):
 
     ret = os.system(command)
 
-    if ret != 0:
+    if ret != 0 and not ignore_error:
+        if isinstance(delete_on_error, basestring):
+            delete_on_error = [delete_on_error]
+
+        for todel in delete_on_error:
+            templatedname = string.Template(todel).substitute(tmplvalues)
+            print 'Remove %s?' % templatedname
+            if os.path.exists(templatedname):
+                os.unlink(templatedname)
+
         raise ExternalProcessError(
                 "[%s] Process returned %d while running command %s" %
                 (callerframe[3], ret, repr(command)))

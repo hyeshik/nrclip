@@ -63,12 +63,16 @@ FASTX_ARTIFACTS_FILTER = 'fastx_artifacts_filter'
 GSNAP = 'gsnap' # from gmap/gsnap
 GMAP_BUILD = 'gmap_build' # from gmap/gsnap
 FASOMERECORDS = 'faSomeRecords' # from Jim Kent's ucscgb
+PSL_SPLICESITES = 'psl_splicesites' # from Jim Kent's ucscgb
+IIT_STORE = 'iit_store' # from gmap/gsnap
 
 
 # =================================
 # External resource URLs
 
 GENOME_SEQ_URL = 'http://hgdownload.cse.ucsc.edu/goldenPath/%s/bigZips/chromFa.tar.gz' % GENOME
+REFGENE_URL = 'ftp://hgdownload.cse.ucsc.edu/goldenPath/%s/database/refGene.txt.gz' % GENOME
+KNOWNGENE_URL = 'ftp://hgdownload.cse.ucsc.edu/goldenPath/%s/database/knownGene.txt.gz' % GENOME
 
 
 # ==============
@@ -92,6 +96,10 @@ genome_fasta = rel('%s/%s.fa' % (EXTERNAL_DIR, genome_prefix))
 genome_index_check = rel('%s/%s/%s.ref123positions' % (
                          EXTERNAL_DIR, genome_prefix, genome_prefix))
 genome_fasta_zipped = rel('%s/%s.tar.gz' % (EXTERNAL_DIR, genome_prefix))
+refgene_ucsc = rel(EXTERNAL_DIR + '/refGene.txt.gz')
+knowngene_ucsc = rel(EXTERNAL_DIR + '/knownGene.txt.gz')
+splice_index = rel(EXTERNAL_DIR + '/%s/%s.maps/%s.splicesites.iit' % (
+                    genome_prefix, genome_prefix, genome_prefix))
 
 
 # =========================

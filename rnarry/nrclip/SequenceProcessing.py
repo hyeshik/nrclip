@@ -40,7 +40,8 @@ def fulltag_filter_clip_trim(inputfile, outputfile, sample):
         $FASTQ_QUALITY_TRIMMER -t $FULLTAG_MIN_QUALITY \
             -l $FULLTAG_MIN_LENGTH | \
         $FASTQ_QUALITY_FILTER -q $FULLTAG_MIN_QUALITY \
-            -p $FULLTAG_MIN_QUALITY_PERCENT -z -o $outputfile""")
+            -p $FULLTAG_MIN_QUALITY_PERCENT -z -o $outputfile""",
+        outputfile)
 
 
 @files(for_each_sample(Paths.fulltag_quality_filtered_reads,
@@ -51,7 +52,7 @@ def fulltag_collapse(inputfile, outputfile, sample):
     runproc("""
         $ZCAT $inputfile | \
         $FASTX_COLLAPSER | \
-        $FASTX_ARTIFACTS_FILTER -o $outputfile""")
+        $FASTX_ARTIFACTS_FILTER -o $outputfile""", outputfile)
 
 
 @files(for_each_sample(Paths.original_sequence_reads,
@@ -64,7 +65,7 @@ def shorttag_trim_collapse(inputfile, outputfile, sample):
         $FASTQ_QUALITY_FILTER -q $SHORTTAG_MIN_QUALITY \
             -p $SHORTTAG_MIN_QUALITY_PERCENT | \
         $FASTX_COLLAPSER | \
-        $FASTX_ARTIFACTS_FILTER -o $outputfile""")
+        $FASTX_ARTIFACTS_FILTER -o $outputfile""", outputfile)
 
 
 def tasks():

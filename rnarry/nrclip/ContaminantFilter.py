@@ -38,7 +38,7 @@ def fulltag_contaminant_alignment(inputfile, outputfile, sample):
     runproc("""
         $GSNAP -D $EXTERNAL_DIR -d $early_filter_prefix -B 4 -A sam \
             -m $FULLTAG_PREALN_MISMATCHES -t $NUM_THREADS $inputfile | \
-        $GZIP -c - > $outputfile""")
+        $GZIP -c - > $outputfile""", outputfile)
 
 
 @files(for_each_sample(Paths.shorttag_tags,
@@ -50,7 +50,7 @@ def shorttag_contaminant_alignment(inputfile, outputfile, sample):
     runproc("""
         $GSNAP -D $EXTERNAL_DIR -d $early_filter_prefix -B 4 -A sam \
             -m $SHORTTAG_PREALN_MISMATCHES -t $NUM_THREADS $inputfile | \
-        $GZIP -c - > $outputfile""")
+        $GZIP -c - > $outputfile""", outputfile)
 
 
 def _common_filter_contaminant(seq_fasta, prealn_sam, outputfile):
@@ -63,7 +63,8 @@ def _common_filter_contaminant(seq_fasta, prealn_sam, outputfile):
             $SORT -t- -k1,1n | $UNIQ > $idlist""")
 
         # filter sequences
-        runproc("$FASOMERECORDS -exclude $seq_fasta $idlist $outputfile")
+        runproc('$FASOMERECORDS -exclude $seq_fasta $idlist $outputfile',
+                outputfile)
 
 
 @files(for_each_sample((Paths.fulltag_collapsed_reads,

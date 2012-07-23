@@ -33,12 +33,12 @@ from rnarry.nrclip.PipelineControl import *
 @files(Paths.early_filter_fasta, Paths.early_filter_index_check)
 def generate_gsnap_early_filter_index(inputfile, outcheck):
     runproc('$GMAP_BUILD -d $early_filter_prefix '
-            '-D $EXTERNAL_DIR $inputfile')
+            '-D $EXTERNAL_DIR $inputfile', outcheck)
 
 
 @files(None, Paths.genome_fasta_zipped)
 def download_zipped_genome_sequence(inputfile, outputfile):
-    runproc('$WGET -O $outputfile $GENOME_SEQ_URL')
+    runproc('$WGET -O $outputfile $GENOME_SEQ_URL', outputfile)
 
 
 @files(Paths.genome_fasta_zipped, Paths.genome_fasta)
@@ -46,14 +46,36 @@ def download_zipped_genome_sequence(inputfile, outputfile):
 def extract_genome_sequence(inputfile, outputfile):
     with TemporaryDirectory() as tdir:
         runproc('$TAR -C $tdir -xzf $inputfile')
-        runproc('cd $tdir && cat *.fa > $outputfile')
+        runproc('cd $tdir && cat *.fa > $outputfile', outputfile)
 
 
 @files(Paths.genome_fasta, Paths.genome_index_check)
 @follows(extract_genome_sequence)
 def generate_gsnap_genome_index(inputfile, outcheck):
     runproc('$GMAP_BUILD -d $genome_prefix -D $EXTERNAL_DIR -k 12 '
-            '$inputfile')
+            '$inputfile', outcheck)
+
+
+@files(None, Paths.refgene_ucsc)
+def download_refgene(inputfile, outputfile):
+    runproc('$WGET -O $outputfile $REFGENE_URL', outputfile)
+
+
+@files(None, Paths.knowngene_ucsc)
+def download_knowngene(inputfile, outputfile):
+    runproc('$WGET -O $outputfile $KNOWNGENE_URL', outputfile)
+
+
+@files([Paths.refgene_ucsc, Paths.knowngene_ucsc], Paths.splice_index)
+@follows(download_refgene)
+@follows(download_knowngene)
+def build_splicesites_index(inputfiles, outputfile):
+    refgene, knowngene = inputfiles
+
+    runproc("""
+        ($ZCAT $refgene | $PSL_SPLICESITES -s 1; \
+         $ZCAT $knowngene | $PSL_SPLICESITES) | \
+        $IIT_STORE -o $outputfile""", outputfile)
 
 
 def tasks():
@@ -62,4 +84,7 @@ def tasks():
         download_zipped_genome_sequence,
         extract_genome_sequence,
         generate_gsnap_genome_index,
+        download_refgene,
+        download_knowngene,
+        build_splicesites_index,
     ]
