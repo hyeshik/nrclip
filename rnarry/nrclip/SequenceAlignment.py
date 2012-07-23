@@ -1,4 +1,7 @@
-#!/usr/bin/env python
+#
+# rnarry.nrclip.SequenceAlignment
+#  - aligns sequences to genome or transcriptome
+#
 #
 # Copyright (C) 2012 Hyeshik Chang
 #
@@ -22,22 +25,25 @@
 #
 
 from ruffus import *
-from rnarry.nrclip import (
-    DataPreparation, SequenceProcessing, ContaminantFilter,
-    SequenceAlignment)
-from rnarry.nrclip import Options
-from itertools import chain
+from rnarry.nrclip import Paths, Options, ContaminantFilter
+from rnarry.nrclip.PipelineControl import *
 
-task_modules = [
-    DataPreparation,
-    SequenceProcessing,
-    ContaminantFilter,
-    SequenceAlignment,
-]
 
-all_tasks = list(chain(*[mod.tasks() for mod in task_modules]))
+@files(for_each_sample(Paths.fulltag_filtered_reads,
+                       Paths.fulltag_genome_alignment_sam,
+                       Paths.ALL_SAMPLES))
+@follows(ContaminantFilter.fulltag_filter_contaminant)
+@jobs_limit(1, 'exclusive')
+def fulltag_genome_alignment_sam(inputfile, outputfile, sample):
+    runproc("""
+        $GSNAP -D $EXTERNAL_DIR -d $genome_prefix -O -B 4 -A sam \
+            --terminal-threshold=9999 -s $splice_index \
+            -m $FULLTAG_GENOME_MISMATCHES -t $NUM_THREADS $inputfile | \
+        $GZIP_LT -c - > $outputfile""")
 
-pipeline_printout_graph('flowchart.pdf', 'pdf', all_tasks)
-pipeline_run(all_tasks, verbose=5, multiprocess=Options.NUM_PARALLEL)
 
-# ex: ts=8 sts=4 sw=4 et
+def tasks():
+    return [
+        fulltag_genome_alignment_sam,
+    ]
+

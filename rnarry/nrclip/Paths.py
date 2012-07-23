@@ -45,6 +45,7 @@ AWK = 'awk'
 CUT = 'cut'
 GREP = 'grep'
 GZIP = 'pigz'
+GZIP_LT = 'gzip' # for low throughput outputs
 SORT = 'sort'
 TAR = 'tar'
 UNIQ = 'uniq'
@@ -80,6 +81,7 @@ KNOWNGENE_URL = 'ftp://hgdownload.cse.ucsc.edu/goldenPath/%s/database/knownGene.
 
 EXTERNAL_DIR = 'external'
 ORIGREAD_DIR = 'sequences'
+GENOMEALN_DIR = 'genomealn'
 PREALN_DIR = 'prealns'
 TMP_DIR = 'tmp'
 
@@ -120,4 +122,10 @@ shorttag_prealn_sam = relfmt(PREALN_DIR + '/short-%s.sam.gz')
 
 fulltag_filtered_reads = relfmt(PREALN_DIR + '/full-%s-clean.fa')
 shorttag_filtered_reads = relfmt(PREALN_DIR + '/short-%s-clean.fa')
+
+
+# ===================
+# Sequence alignments
+
+fulltag_genome_alignment_sam = relfmt(GENOMEALN_DIR + '/%s.sam.gz')
 
