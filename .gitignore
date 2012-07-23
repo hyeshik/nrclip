@@ -12,3 +12,4 @@ external/knownGene.txt.gz
 external/refGene.txt.gz
 genomealn/*
 flowchart.*
+external/mirbase.bed
