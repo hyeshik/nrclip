@@ -56,7 +56,6 @@ def runproc(origcmd, delete_on_error=[], ignore_error=False):
 
         for todel in delete_on_error:
             templatedname = string.Template(todel).substitute(tmplvalues)
-            print 'Remove %s?' % templatedname
             if os.path.exists(templatedname):
                 os.unlink(templatedname)
 

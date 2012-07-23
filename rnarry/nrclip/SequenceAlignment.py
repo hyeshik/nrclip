@@ -25,13 +25,15 @@
 #
 
 from ruffus import *
-from rnarry.nrclip import Paths, Options, ContaminantFilter
+from rnarry.nrclip import Paths, Options, ContaminantFilter, DataPreparation
 from rnarry.nrclip.PipelineControl import *
 
 
 @files(for_each_sample(Paths.fulltag_filtered_reads,
                        Paths.fulltag_genome_alignment_sam,
                        Paths.ALL_SAMPLES))
+@follows(DataPreparation.generate_gsnap_genome_index)
+@follows(DataPreparation.build_splicesites_index)
 @follows(ContaminantFilter.fulltag_filter_contaminant)
 @jobs_limit(1, 'exclusive')
 def fulltag_genome_alignment_sam(inputfile, outputfile, sample):
@@ -39,11 +41,23 @@ def fulltag_genome_alignment_sam(inputfile, outputfile, sample):
         $GSNAP -D $EXTERNAL_DIR -d $genome_prefix -O -B 4 -A sam \
             --terminal-threshold=9999 -s $splice_index \
             -m $FULLTAG_GENOME_MISMATCHES -t $NUM_THREADS $inputfile | \
-        $GZIP_LT -c - > $outputfile""")
+        $GZIP_LT -c - > $outputfile""", outputfile)
+
+
+@files(for_each_sample(Paths.fulltag_genome_alignment_sam,
+                       Paths.fulltag_genome_besthits,
+                       Paths.ALL_SAMPLES))
+@follows(fulltag_genome_alignment_sam)
+def fulltag_genome_resolve_multihit(inputfile, outputfile, sample):
+    runproc("""
+        $ZCAT $inputfile | \
+        $SAM_MULTIHIT_RESOLVE $GENOMEALN_POSTPROC_ALLOWED_MISMATCHES | \
+        $GZIP_LT -c - > $outputfile""", outputfile)
 
 
 def tasks():
     return [
         fulltag_genome_alignment_sam,
+        fulltag_genome_resolve_multihit,
     ]
 

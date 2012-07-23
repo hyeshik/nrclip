@@ -67,6 +67,9 @@ FASOMERECORDS = 'faSomeRecords' # from Jim Kent's ucscgb
 PSL_SPLICESITES = 'psl_splicesites' # from Jim Kent's ucscgb
 IIT_STORE = 'iit_store' # from gmap/gsnap
 
+#- Local scripts
+SAM_MULTIHIT_RESOLVE = 'python scripts/sam-multihit-resolve.py'
+
 
 # =================================
 # External resource URLs
@@ -128,4 +131,5 @@ shorttag_filtered_reads = relfmt(PREALN_DIR + '/short-%s-clean.fa')
 # Sequence alignments
 
 fulltag_genome_alignment_sam = relfmt(GENOMEALN_DIR + '/%s.sam.gz')
+fulltag_genome_besthits = relfmt(GENOMEALN_DIR + '/%s-besthits.sam.gz')
 

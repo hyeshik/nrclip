@@ -8,3 +8,7 @@ sequences/*-hq.fq.gz
 sequences/*-total.fa
 sequences/*-tags.fa
 prealns/*
+external/knownGene.txt.gz
+external/refGene.txt.gz
+genomealn/*
+flowchart.*
