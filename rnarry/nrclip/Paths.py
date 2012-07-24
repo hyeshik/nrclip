@@ -131,9 +131,9 @@ mirbase_catalog = rel(EXTERNAL_DIR + '/mirbase.bed.gz')
 refseq_catalog = rel(EXTERNAL_DIR + '/refseq.bed.gz')
 repeatmasker_original = relfmt(DOWNLOAD_DIR + '/rmsk-chr%s.txt.gz')
 repeatmasker_catalog = rel(EXTERNAL_DIR + '/repeatmasker.bed.gz')
-rfam_fasta = rel(EXTERNAL_DIR + '/Rfam.fasta.gz')
-rfam_original = rel(EXTERNAL_DIR + '/Rfam.full.gz')
-rfam_catalog = rel(EXTERNAL_DIR + 'rfam.bed.gz')
+rfam_fasta = rel(DOWNLOAD_DIR + '/Rfam.fasta.gz')
+rfam_original = rel(DOWNLOAD_DIR + '/Rfam.full.gz')
+rfam_catalog = rel(EXTERNAL_DIR + '/rfam.bed.gz')
 
 
 # =========================
