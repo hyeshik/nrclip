@@ -30,6 +30,7 @@
 
 NUM_PARALLEL = 8
 NUM_THREADS = 24
+MAX_PARALLEL_DOWNLOADING = 4
 
 GENOME = 'mm9'
 CLIP_SAMPLES = ['CLIP-35L33G', 'CLIP-2J3', 'CLIP-46020']
@@ -66,4 +67,12 @@ SHORTTAG_PREALN_MISMATCHES = '0.05'
 FULLTAG_GENOME_MISMATCHES = '0.1'
 
 GENOMEALN_POSTPROC_ALLOWED_MISMATCHES = 2
+
+# Annotation settings
+UCSC_REPEATMASKER_CHROMOSOMES = """
+1 10 11 12 13 13_random 14 15 16 16_random 17 17_random 18
+7 19 1_random 2 3 3_random 4 4_random 5 5_random 6 7 7_random 8 8_random 9
+8 9_random M Un_random X X_random Y Y_random""".split()
+# These RNAs are annotated by gtRNAdb and/or rfam.
+REPEATMASKER_IGNORE_CLASSES = 'tRNA snRNA scRNA srpRNA'.split()
 

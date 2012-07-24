@@ -26,11 +26,11 @@
 
 import os
 import inspect
+import gzip
 import string
 import tempfile
 import shutil
 
-from ruffus.task import task_decorator
 from rnarry.nrclip import Paths
 
 __all__ = ['runproc', 'ExternalProcessError', 'TemporaryDirectory',
@@ -77,6 +77,7 @@ class TemporaryDirectory(object):
         if self.path is not None:
             shutil.rmtree(self.path)
 
+
 class TemporaryFile(object):
     def __init__(self, dir=Paths.TMP_DIR):
         self.dir = dir
@@ -90,16 +91,22 @@ class TemporaryFile(object):
         if self.path is not None and os.path.exists(self.path):
             os.unlink(self.path)
 
+
 class DeleteOnError(object):
-    def __init__(self, path):
+    def __init__(self, path, opener=None):
         self.path = path
+        self.opener = opener
 
     def __enter__(self):
-        return open(self.path, 'w')
+        if self.opener is None:
+            return open(self.path, 'w')
+        else:
+            return self.opener(self.path, 'w')
 
     def __exit__(self, type, value, traceback):
         if type is not None and os.path.exists(self.path):
             os.unlink(self.path)
+
 
 def for_each_sample(inputpat, outputpat, samples):
     def instantiate(pat, sample):

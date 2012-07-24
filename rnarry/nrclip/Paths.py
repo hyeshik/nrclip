@@ -78,6 +78,7 @@ GENOME_SEQ_URL = 'http://hgdownload.cse.ucsc.edu/goldenPath/%s/bigZips/chromFa.t
 REFGENE_URL = 'ftp://hgdownload.cse.ucsc.edu/goldenPath/%s/database/refGene.txt.gz' % GENOME
 KNOWNGENE_URL = 'ftp://hgdownload.cse.ucsc.edu/goldenPath/%s/database/knownGene.txt.gz' % GENOME
 MIRBASE_URL = 'ftp://mirbase.org/pub/mirbase/18/genomes/mmu.gff2'
+REPEATMASKER_URL = 'http://hgdownload.cse.ucsc.edu/goldenPath/%s/database/chr%s_rmsk.txt.gz'
 
 
 # ==============
@@ -86,8 +87,14 @@ MIRBASE_URL = 'ftp://mirbase.org/pub/mirbase/18/genomes/mmu.gff2'
 EXTERNAL_DIR = 'external'
 ORIGREAD_DIR = 'sequences'
 GENOMEALN_DIR = 'genomealn'
+DOWNLOAD_DIR = 'external/downloaded'
 PREALN_DIR = 'prealns'
 TMP_DIR = 'tmp'
+
+ALL_SUBDIRS = [
+    EXTERNAL_DIR, ORIGREAD_DIR, GENOMEALN_DIR, DOWNLOAD_DIR,
+    PREALN_DIR, TMP_DIR
+]
 
 
 # ===============================
@@ -107,7 +114,10 @@ knowngene_ucsc = rel(EXTERNAL_DIR + '/knownGene.txt.gz')
 splice_index = rel(EXTERNAL_DIR + '/%s/%s.maps/%s.splicesites.iit' % (
                     genome_prefix, genome_prefix, genome_prefix))
 
-mirbase_catalog = rel(EXTERNAL_DIR + '/mirbase.bed')
+mirbase_catalog = rel(EXTERNAL_DIR + '/mirbase.bed.gz')
+
+repeatmasker_original = relfmt(DOWNLOAD_DIR + '/rmsk-chr%s.txt.gz')
+repeatmasker_catalog = rel(EXTERNAL_DIR + '/repeatmasker.bed.gz')
 
 
 # =========================

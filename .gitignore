@@ -12,4 +12,6 @@ external/knownGene.txt.gz
 external/refGene.txt.gz
 genomealn/*
 flowchart.*
-external/mirbase.bed
+external/downloaded/*
+external/mirbase.bed.gz
+external/repeatmasker.bed.gz
