@@ -130,6 +130,42 @@ def merge_repeatmasker_catalogs(inputfiles, outputfile):
                 fields[10], fields[1], fields[9])
 
 
+@files(Paths.refgene_ucsc, Paths.refseq_catalog)
+@follows(download_refgene)
+def prepare_refseq_catalog(inputfile, outputfile):
+    outputdir = os.path.dirname(outputfile)
+    runproc('$BUILD_REFSEQ_INDEX $outputdir $inputfile', outputfile)
+
+
+@files(Paths.genome_fasta, Paths.genome_twobit)
+@follows(extract_genome_sequence)
+def prepare_genome_2bit(inputfile, outputfile):
+    runproc('$FA2TWOBIT $inputfile $outputfile', outputfile)
+
+
+@files(None, [Paths.rfam_fasta, Paths.rfam_original])
+@jobs_limit(Options.MAX_PARALLEL_DOWNLOADING, 'download')
+def download_rfam_files(inputfile, outputfiles):
+    import urllib
+
+    origurls = dict((os.path.basename(url), url)
+                   for url in (Paths.RFAM_FULL_URL, Paths.RFAM_SEQUENCE_URL))
+
+    for outputfile in outputfiles:
+        url = origurls[os.path.basename(outputfile)]
+        print "Downloading %s ..." % url
+        urllib.urlretrieve(url, outputfile)
+
+
+@files([Paths.rfam_fasta, Paths.rfam_original], Paths.rfam_catalog)
+@follows(download_rfam_files)
+def prepare_rfam_catalog(inputfiles, outputfile):
+    rfamseq, rfamfull = inputfiles
+
+    runproc("""$BUILD_RFAM_INDEX $TMP_DIR $rfam_fasta $rfam_original \
+               "$SPECIES" $genome_twobit $outputfile""", outputfile)
+
+
 def tasks():
     return [
         generate_gsnap_early_filter_index,
@@ -142,4 +178,8 @@ def tasks():
         download_mirbase_catalog,
         download_repeatmasker_catalogs,
         merge_repeatmasker_catalogs,
+        prepare_refseq_catalog,
+        prepare_genome_2bit,
+        download_rfam_files,
+        prepare_rfam_catalog,
     ]

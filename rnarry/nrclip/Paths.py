@@ -44,13 +44,15 @@ def relfmt(path):
 AWK = 'awk'
 CUT = 'cut'
 GREP = 'grep'
-GZIP = 'pigz'
 GZIP_LT = 'gzip' # for low throughput outputs
+GZIP = 'pigz'
+SED = 'sed'
 SORT = 'sort'
 TAR = 'tar'
 UNIQ = 'uniq'
 WGET = 'wget'
 ZCAT = 'zcat'
+ZGREP = 'zgrep'
 
 #- A. Gordon's FASTX_Toolkit
 FASTX_CLIPPER = 'fastx_clipper'
@@ -63,12 +65,20 @@ FASTX_ARTIFACTS_FILTER = 'fastx_artifacts_filter'
 #- Bioinformatic tools
 GSNAP = 'gsnap' # from gmap/gsnap
 GMAP_BUILD = 'gmap_build' # from gmap/gsnap
-FASOMERECORDS = 'faSomeRecords' # from Jim Kent's ucscgb
-PSL_SPLICESITES = 'psl_splicesites' # from Jim Kent's ucscgb
 IIT_STORE = 'iit_store' # from gmap/gsnap
+
+#- Jim Kent's UCSC Genome Browser tools
+FASOMERECORDS = 'faSomeRecords'
+PSL_SPLICESITES = 'psl_splicesites'
+FA2TWOBIT = 'faToTwoBit'
+BLAT = 'blat'
+PSL_CDNAFILTER = 'pslCDnaFilter'
+PSL2BED = 'pslToBed'
 
 #- Local scripts
 SAM_MULTIHIT_RESOLVE = 'python scripts/sam-multihit-resolve.py'
+BUILD_REFSEQ_INDEX = 'python scripts/build-refseq-index.py'
+BUILD_RFAM_INDEX = 'sh scripts/build-rfam-index.sh'
 
 
 # =================================
@@ -79,6 +89,8 @@ REFGENE_URL = 'ftp://hgdownload.cse.ucsc.edu/goldenPath/%s/database/refGene.txt.
 KNOWNGENE_URL = 'ftp://hgdownload.cse.ucsc.edu/goldenPath/%s/database/knownGene.txt.gz' % GENOME
 MIRBASE_URL = 'ftp://mirbase.org/pub/mirbase/18/genomes/mmu.gff2'
 REPEATMASKER_URL = 'http://hgdownload.cse.ucsc.edu/goldenPath/%s/database/chr%s_rmsk.txt.gz'
+RFAM_FULL_URL = 'ftp://ftp.sanger.ac.uk/pub/databases/Rfam/CURRENT/Rfam.full.gz'
+RFAM_SEQUENCE_URL = 'ftp://ftp.sanger.ac.uk/pub/databases/Rfam/CURRENT/Rfam.fasta.gz'
 
 
 # ==============
@@ -109,15 +121,19 @@ genome_fasta = rel('%s/%s.fa' % (EXTERNAL_DIR, genome_prefix))
 genome_index_check = rel('%s/%s/%s.ref123positions' % (
                          EXTERNAL_DIR, genome_prefix, genome_prefix))
 genome_fasta_zipped = rel('%s/%s.tar.gz' % (EXTERNAL_DIR, genome_prefix))
+genome_twobit = rel('%s/%s.2bit' % (EXTERNAL_DIR, genome_prefix))
 refgene_ucsc = rel(EXTERNAL_DIR + '/refGene.txt.gz')
 knowngene_ucsc = rel(EXTERNAL_DIR + '/knownGene.txt.gz')
 splice_index = rel(EXTERNAL_DIR + '/%s/%s.maps/%s.splicesites.iit' % (
                     genome_prefix, genome_prefix, genome_prefix))
 
 mirbase_catalog = rel(EXTERNAL_DIR + '/mirbase.bed.gz')
-
+refseq_catalog = rel(EXTERNAL_DIR + '/refseq.bed.gz')
 repeatmasker_original = relfmt(DOWNLOAD_DIR + '/rmsk-chr%s.txt.gz')
 repeatmasker_catalog = rel(EXTERNAL_DIR + '/repeatmasker.bed.gz')
+rfam_fasta = rel(EXTERNAL_DIR + '/Rfam.fasta.gz')
+rfam_original = rel(EXTERNAL_DIR + '/Rfam.full.gz')
+rfam_catalog = rel(EXTERNAL_DIR + 'rfam.bed.gz')
 
 
 # =========================

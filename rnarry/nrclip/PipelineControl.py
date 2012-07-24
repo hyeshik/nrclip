@@ -25,6 +25,7 @@
 #
 
 import os
+import sys
 import inspect
 import gzip
 import string
@@ -48,6 +49,7 @@ def runproc(origcmd, delete_on_error=[], ignore_error=False):
     tmplvalues.update(callerframe[0].f_locals)
     command = cmdtemplate.substitute(tmplvalues).strip()
 
+    print >> sys.stderr, "==> Running " + command
     ret = os.system(command)
 
     if ret != 0 and not ignore_error:
@@ -79,17 +81,29 @@ class TemporaryDirectory(object):
 
 
 class TemporaryFile(object):
-    def __init__(self, dir=Paths.TMP_DIR):
+    def __init__(self, dir=Paths.TMP_DIR, asmanyas=1):
         self.dir = dir
         self.path = None
+        self.filecount = asmanyas
 
     def __enter__(self):
-        self.path = tempfile.mkstemp(dir=self.dir)[1]
+        if self.filecount == 1:
+            self.path = tempfile.mkstemp(dir=self.dir)[1]
+        else:
+            self.path = tuple([tempfile.mkstemp(dir=self.dir)[1]
+                               for i in range(self.filecount)])
+
         return self.path
 
     def __exit__(self, type, value, traceback):
-        if self.path is not None and os.path.exists(self.path):
-            os.unlink(self.path)
+        if self.filecount == 1:
+            paths = [self.path]
+        else:
+            paths = self.path
+
+        for path in paths:
+            if path is not None and os.path.exists(path):
+                os.unlink(path)
 
 
 class DeleteOnError(object):
