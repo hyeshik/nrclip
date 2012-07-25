@@ -87,10 +87,11 @@ BUILD_RFAM_INDEX = 'sh scripts/build-rfam-index.sh'
 GENOME_SEQ_URL = 'http://hgdownload.cse.ucsc.edu/goldenPath/%s/bigZips/chromFa.tar.gz' % GENOME
 REFGENE_URL = 'ftp://hgdownload.cse.ucsc.edu/goldenPath/%s/database/refGene.txt.gz' % GENOME
 KNOWNGENE_URL = 'ftp://hgdownload.cse.ucsc.edu/goldenPath/%s/database/knownGene.txt.gz' % GENOME
-MIRBASE_URL = 'ftp://mirbase.org/pub/mirbase/18/genomes/mmu.gff2'
+MIRBASE_URL = 'ftp://mirbase.org/pub/mirbase/18/genomes/%s.gff2' % SPECIES3
 REPEATMASKER_URL = 'http://hgdownload.cse.ucsc.edu/goldenPath/%s/database/chr%s_rmsk.txt.gz'
 RFAM_FULL_URL = 'ftp://ftp.sanger.ac.uk/pub/databases/Rfam/CURRENT/Rfam.full.gz'
 RFAM_SEQUENCE_URL = 'ftp://ftp.sanger.ac.uk/pub/databases/Rfam/CURRENT/Rfam.fasta.gz'
+GTRNADB_URL = 'http://hgdownload.cse.ucsc.edu/goldenPath/%s/database/tRNAs.txt.gz' % GENOME
 
 
 # ==============
@@ -134,6 +135,7 @@ repeatmasker_catalog = rel(EXTERNAL_DIR + '/repeatmasker.bed.gz')
 rfam_fasta = rel(DOWNLOAD_DIR + '/Rfam.fasta.gz')
 rfam_original = rel(DOWNLOAD_DIR + '/Rfam.full.gz')
 rfam_catalog = rel(EXTERNAL_DIR + '/rfam.bed.gz')
+trna_catalog = rel(EXTERNAL_DIR + '/trna.bed.gz')
 
 
 # =========================

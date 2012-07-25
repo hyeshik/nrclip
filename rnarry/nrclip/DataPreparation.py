@@ -166,6 +166,21 @@ def prepare_rfam_catalog(inputfiles, outputfile):
                "$SPECIES" $genome_twobit $outputfile""", outputfile)
 
 
+@files(None, Paths.trna_catalog)
+@jobs_limit(Options.MAX_PARALLEL_DOWNLOADING, 'download')
+def download_trna_catalog(inputfile, outputfile):
+    import urllib, re, gzip, StringIO
+
+    inpbuf = StringIO.StringIO(urllib.urlopen(Paths.GTRNADB_URL).read())
+
+    with DeleteOnError(outputfile, gzip.open) as output:
+        for line in gzip.GzipFile(fileobj=inpbuf):
+            fields = line[:-1].split('\t')
+            print >> output, '\t'.join([
+                fields[1], fields[2], fields[3],
+                'tRNA|tRNA-' + fields[7] + fields[8], fields[5], fields[6]])
+
+
 def tasks():
     return [
         generate_gsnap_early_filter_index,
@@ -182,4 +197,5 @@ def tasks():
         prepare_genome_2bit,
         download_rfam_files,
         prepare_rfam_catalog,
+        download_trna_catalog,
     ]
