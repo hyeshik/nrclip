@@ -1,5 +1,6 @@
 *.swp
 *.pyc
+external/all-annotations.bed.gz
 external/downloaded/*
 external/early-filter/*
 external/knownGene.txt.gz
@@ -14,11 +15,14 @@ external/refseq-instances.pickle
 external/refseq-intervals.pickle
 external/refseq-lengths.pickle
 external/repeatmasker.bed.gz
+external/rfam.bed.gz
 external/Rfam.fasta.gz
 external/Rfam.full.gz
+external/trna.bed.gz
 sequences/*-hq.fq.gz
 sequences/*-total.fa
 sequences/*-tags.fa
+annotations/*
 prealns/*
 tmp/*
 genomealn/*
