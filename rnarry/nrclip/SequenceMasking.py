@@ -29,41 +29,53 @@ from rnarry.nrclip import Paths, Options, SequenceAnnotation
 from rnarry.nrclip.PipelineControl import *
 
 
-@files(for_each_sample(Paths.fulltag_primary_annotation,
-                       Paths.fulltag_masked_readids,
-                       Paths.ALL_SAMPLES))
-@follows(SequenceAnnotation.annotate_fulltags)
+@files(for_each(Paths.fulltag_primary_annotation,
+                Paths.fulltag_masked_readids,
+                Paths.ALL_SAMPLES) +
+       for_each(Paths.shorttag_primary_annotation,
+                Paths.shorttag_masked_readids,
+                Paths.SHORTTAG_SAMPLES))
+@follows(SequenceAnnotation.annotate_sequences)
 def make_list_of_masked_sequences(inputfile, outputfile, sample):
     runproc("$ZGREP '	[rt]RNA' $inputfile | $CUT -f4 | uniq > $outputfile",
             outputfile)
 
 
-@files(for_each_sample([Paths.fulltag_genome_alignment_sam,
-                        Paths.fulltag_masked_readids],
-                       Paths.fulltag_masked_alignments,
-                       Paths.ALL_SAMPLES))
+@files(for_each([Paths.fulltag_genome_alignment_sam,
+                 Paths.fulltag_masked_readids],
+                Paths.fulltag_masked_alignments,
+                Paths.ALL_SAMPLES) +
+       for_each([Paths.shorttag_genome_alignment_sam,
+                 Paths.shorttag_masked_readids],
+                Paths.shorttag_masked_alignments,
+                Paths.SHORTTAG_SAMPLES))
 @follows(make_list_of_masked_sequences)
-def produce_masked_fulltag_sam(inputfile, outputfile, sample):
+def produce_masked_sam(inputfile, outputfile, sample):
     alnfile, maskinglist = inputfile
     runproc("$SAM_ID_FILTER $alnfile $maskinglist | $GZIP -c - > $outputfile",
             outputfile)
 
 
-@files(for_each_sample([Paths.fulltag_filtered_reads,
-                        Paths.fulltag_masked_readids],
-                       Paths.fulltag_masked_reads,
-                       Paths.ALL_SAMPLES))
+@files(for_each([Paths.fulltag_filtered_reads,
+                 Paths.fulltag_masked_readids],
+                Paths.fulltag_masked_reads,
+                Paths.ALL_SAMPLES) +
+       for_each([Paths.shorttag_filtered_reads,
+                 Paths.shorttag_masked_readids],
+                Paths.shorttag_masked_reads,
+                Paths.SHORTTAG_SAMPLES))
 @follows(make_list_of_masked_sequences)
-def produce_masked_fulltag_fasta(inputfile, outputfile, sample):
+def produce_masked_fasta(inputfile, outputfile, sample):
     seqfile, maskinglist = inputfile
     runproc("$FASOMERECORDS -exclude $seqfile $maskinglist $outputfile",
             outputfile)
 
 
+
 def tasks():
     return [
         make_list_of_masked_sequences,
-        produce_masked_fulltag_sam,
-        produce_masked_fulltag_fasta,
+        produce_masked_sam,
+        produce_masked_fasta,
     ]
 

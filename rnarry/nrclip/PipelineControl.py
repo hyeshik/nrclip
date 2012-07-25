@@ -35,7 +35,7 @@ import shutil
 from rnarry.nrclip import Paths
 
 __all__ = ['runproc', 'ExternalProcessError', 'TemporaryDirectory',
-           'TemporaryFile', 'DeleteOnError', 'for_each_sample']
+           'TemporaryFile', 'DeleteOnError', 'for_each']
 
 class ExternalProcessError(Exception):
     pass
@@ -122,7 +122,7 @@ class DeleteOnError(object):
             os.unlink(self.path)
 
 
-def for_each_sample(inputpat, outputpat, samples):
+def for_each(inputpat, outputpat, samples, extra_parameters=[]):
     def instantiate(pat, sample):
         if callable(pat):
             return pat(sample)
@@ -130,5 +130,6 @@ def for_each_sample(inputpat, outputpat, samples):
 
     return [[instantiate(inputpat, sample),
              instantiate(outputpat, sample), sample]
+             + [(p(sample) if callable(p) else p) for p in extra_parameters]
             for sample in samples]
 

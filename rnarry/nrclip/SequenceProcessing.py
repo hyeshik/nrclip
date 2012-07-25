@@ -29,9 +29,9 @@ from rnarry.nrclip import Paths, Options
 from rnarry.nrclip.PipelineControl import *
 
 
-@files(for_each_sample(Paths.original_sequence_reads,
-                       Paths.fulltag_quality_filtered_reads,
-                       Paths.ALL_SAMPLES))
+@files(for_each(Paths.original_sequence_reads,
+                Paths.fulltag_quality_filtered_reads,
+                Paths.ALL_SAMPLES))
 def fulltag_filter_clip_trim(inputfile, outputfile, sample):
     adapter = Options.ADAPTER_SEQ[sample]
     runproc("""
@@ -44,9 +44,9 @@ def fulltag_filter_clip_trim(inputfile, outputfile, sample):
         outputfile)
 
 
-@files(for_each_sample(Paths.fulltag_quality_filtered_reads,
-                       Paths.fulltag_collapsed_reads,
-                       Paths.ALL_SAMPLES))
+@files(for_each(Paths.fulltag_quality_filtered_reads,
+                Paths.fulltag_collapsed_reads,
+                Paths.ALL_SAMPLES))
 @follows(fulltag_filter_clip_trim)
 def fulltag_collapse(inputfile, outputfile, sample):
     runproc("""
@@ -55,9 +55,9 @@ def fulltag_collapse(inputfile, outputfile, sample):
         $FASTX_ARTIFACTS_FILTER -o $outputfile""", outputfile)
 
 
-@files(for_each_sample(Paths.original_sequence_reads,
-                       Paths.shorttag_tags,
-                       Paths.SHORTTAG_SAMPLES))
+@files(for_each(Paths.original_sequence_reads,
+                Paths.shorttag_tags,
+                Paths.SHORTTAG_SAMPLES))
 def shorttag_trim_collapse(inputfile, outputfile, sample):
     runproc("""
         $ZCAT $inputfile | \

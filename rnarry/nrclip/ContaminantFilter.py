@@ -29,33 +29,35 @@ from rnarry.nrclip import Paths, Options, SequenceProcessing, DataPreparation
 from rnarry.nrclip.PipelineControl import *
 
 
-@files(for_each_sample(Paths.fulltag_collapsed_reads,
-                       Paths.fulltag_prealn_sam,
-                       Paths.ALL_SAMPLES))
+@files(for_each(Paths.fulltag_collapsed_reads,
+                Paths.fulltag_prealn_sam,
+                Paths.ALL_SAMPLES,
+                [Options.FULLTAG_PREALN_MISMATCHES]) +
+       for_each(Paths.shorttag_tags,
+                Paths.shorttag_prealn_sam,
+                Paths.SHORTTAG_SAMPLES,
+                [Options.SHORTTAG_PREALN_MISMATCHES]))
 @follows(SequenceProcessing.fulltag_collapse)
+@follows(SequenceProcessing.shorttag_trim_collapse)
 @follows(DataPreparation.generate_gsnap_early_filter_index)
 @jobs_limit(1, 'exclusive')
-def fulltag_contaminant_alignment(inputfile, outputfile, sample):
+def align_to_known_contaminants(inputfile, outputfile, sample):
     runproc("""
         $GSNAP -D $EXTERNAL_DIR -d $early_filter_prefix -B 4 -A sam \
             -m $FULLTAG_PREALN_MISMATCHES -t $NUM_THREADS $inputfile | \
         $GZIP -c - > $outputfile""", outputfile)
 
 
-@files(for_each_sample(Paths.shorttag_tags,
-                       Paths.shorttag_prealn_sam,
-                       Paths.SHORTTAG_SAMPLES))
-@follows(SequenceProcessing.shorttag_trim_collapse)
-@follows(DataPreparation.generate_gsnap_early_filter_index)
-@jobs_limit(1, 'exclusive')
-def shorttag_contaminant_alignment(inputfile, outputfile, sample):
-    runproc("""
-        $GSNAP -D $EXTERNAL_DIR -d $early_filter_prefix -B 4 -A sam \
-            -m $SHORTTAG_PREALN_MISMATCHES -t $NUM_THREADS $inputfile | \
-        $GZIP -c - > $outputfile""", outputfile)
+@files(for_each((Paths.fulltag_collapsed_reads, Paths.fulltag_prealn_sam),
+                Paths.fulltag_filtered_reads,
+                Paths.ALL_SAMPLES) +
+       for_each((Paths.shorttag_tags, Paths.shorttag_prealn_sam),
+                Paths.shorttag_filtered_reads,
+                Paths.SHORTTAG_SAMPLES))
+@follows(align_to_known_contaminants)
+def filter_contaminants(inputfiles, outputfile, sample):
+    seq_fasta, prealn_sam = inputfile
 
-
-def _common_filter_contaminant(seq_fasta, prealn_sam, outputfile):
     with TemporaryFile() as idlist:
         # prepare list of sequence IDs
         runproc("""
@@ -69,29 +71,9 @@ def _common_filter_contaminant(seq_fasta, prealn_sam, outputfile):
                 outputfile)
 
 
-@files(for_each_sample((Paths.fulltag_collapsed_reads,
-                        Paths.fulltag_prealn_sam),
-                       Paths.fulltag_filtered_reads,
-                       Paths.ALL_SAMPLES))
-@follows(fulltag_contaminant_alignment)
-def fulltag_filter_contaminant(inputfile, outputfile, sample):
-    return _common_filter_contaminant(inputfile[0], inputfile[1], outputfile)
-
-
-@files(for_each_sample((Paths.shorttag_tags,
-                        Paths.shorttag_prealn_sam),
-                       Paths.shorttag_filtered_reads,
-                       Paths.SHORTTAG_SAMPLES))
-@follows(shorttag_contaminant_alignment)
-def shorttag_filter_contaminant(inputfile, outputfile, sample):
-    return _common_filter_contaminant(inputfile[0], inputfile[1], outputfile)
-
-
 def tasks():
     return [
-        fulltag_contaminant_alignment,
-        shorttag_contaminant_alignment,
-        fulltag_filter_contaminant,
-        shorttag_filter_contaminant,
+        align_to_known_contaminants,
+        filter_contaminants,
     ]
 

@@ -29,69 +29,52 @@ from rnarry.nrclip import Paths, Options, ContaminantFilter, DataPreparation
 from rnarry.nrclip.PipelineControl import *
 
 
-@files(for_each_sample(Paths.fulltag_filtered_reads,
-                       Paths.fulltag_genome_alignment_sam,
-                       Paths.ALL_SAMPLES))
+@files(for_each(Paths.fulltag_filtered_reads,
+                Paths.fulltag_genome_alignment_sam,
+                Paths.ALL_SAMPLES,
+                [Options.FULLTAG_GENOME_MISMATCHES]) +
+       for_each(Paths.shorttag_filtered_reads,
+                Paths.shorttag_genome_alignment_sam,
+                Paths.SHORTTAG_SAMPLES,
+                [Options.SHORTTAG_GENOME_MISMATCHES]))
 @follows(DataPreparation.generate_gsnap_genome_index)
 @follows(DataPreparation.build_splicesites_index)
-@follows(ContaminantFilter.fulltag_filter_contaminant)
+@follows(ContaminantFilter.filter_contaminants)
 @jobs_limit(1, 'exclusive')
-def fulltag_genome_alignment_sam(inputfile, outputfile, sample):
+def align_to_genome_sam(inputfile, outputfile, sample, mismatches):
     runproc("""
         $GSNAP -D $EXTERNAL_DIR -d $genome_prefix -O -B 4 -A sam \
             --terminal-threshold=9999 -s $splice_index \
-            -m $FULLTAG_GENOME_MISMATCHES -t $NUM_THREADS $inputfile | \
+            -m $mismatches -t $NUM_THREADS $inputfile | \
         $GZIP -c - > $outputfile""", outputfile)
 
 
-@files(for_each_sample(Paths.fulltag_genome_alignment_sam,
-                       Paths.fulltag_genome_besthits,
-                       Paths.ALL_SAMPLES))
-@follows(fulltag_genome_alignment_sam)
-def fulltag_genome_resolve_multihit(inputfile, outputfile, sample):
-    runproc("""
-        $ZCAT $inputfile | \
-        $SAM_MULTIHIT_RESOLVE $GENOMEALN_POSTPROC_ALLOWED_MISMATCHES | \
-        $GZIP -c - > $outputfile""", outputfile)
+#@files(for_each(Paths.fulltag_genome_alignment_sam,
+#                Paths.fulltag_genome_besthits,
+#                Paths.ALL_SAMPLES))
+#@follows(fulltag_genome_alignment_sam)
+#def fulltag_genome_resolve_multihit(inputfile, outputfile, sample):
+#    runproc("""
+#        $ZCAT $inputfile | \
+#        $SAM_MULTIHIT_RESOLVE $GENOMEALN_POSTPROC_ALLOWED_MISMATCHES | \
+#        $GZIP -c - > $outputfile""", outputfile)
 
 
-@files(for_each_sample(Paths.fulltag_genome_alignment_sam,
-                       Paths.fulltag_genome_alignment_unsorted_bam,
-                       Paths.ALL_SAMPLES))
-@follows(fulltag_genome_alignment_sam)
-def fulltag_convert_primary_alignment_to_bam(inputfile, outputfile, sample):
-    runproc("$SAMTOOLS view -bS -o $outputfile $inputfile")
-
-
-@files(for_each_sample(Paths.shorttag_filtered_reads,
-                       Paths.shorttag_genome_alignment_sam,
-                       Paths.SHORTTAG_SAMPLES))
-@follows(DataPreparation.generate_gsnap_genome_index)
-@follows(DataPreparation.build_splicesites_index)
-@follows(ContaminantFilter.shorttag_filter_contaminant)
-@jobs_limit(1, 'exclusive')
-def shorttag_genome_alignment_sam(inputfile, outputfile, sample):
-    runproc("""
-        $GSNAP -D $EXTERNAL_DIR -d $genome_prefix -O -B 4 -A sam \
-            --terminal-threshold=9999 -s $splice_index \
-            -m $FULLTAG_GENOME_MISMATCHES -t $NUM_THREADS $inputfile | \
-        $GZIP -c - > $outputfile""", outputfile)
-
-
-@files(for_each_sample(Paths.shorttag_genome_alignment_sam,
-                       Paths.shorttag_genome_alignment_unsorted_bam,
-                       Paths.SHORTTAG_SAMPLES))
-@follows(shorttag_genome_alignment_sam)
-def shorttag_convert_primary_alignment_to_bam(inputfile, outputfile, sample):
+@files(for_each(Paths.fulltag_genome_alignment_sam,
+                Paths.fulltag_genome_alignment_unsorted_bam,
+                Paths.ALL_SAMPLES) +
+       for_each(Paths.shorttag_genome_alignment_sam,
+                Paths.shorttag_genome_alignment_unsorted_bam,
+                Paths.SHORTTAG_SAMPLES))
+@follows(align_to_genome_sam)
+def convert_primary_alignment_to_bam(inputfile, outputfile, sample):
     runproc("$SAMTOOLS view -bS -o $outputfile $inputfile")
 
 
 def tasks():
     return [
-        fulltag_genome_alignment_sam,
-        fulltag_genome_resolve_multihit,
-        fulltag_convert_primary_alignment_to_bam,
-        shorttag_genome_alignment_sam,
-        shorttag_convert_primary_alignment_to_bam,
+        align_to_genome_sam,
+        #fulltag_genome_resolve_multihit,
+        convert_primary_alignment_to_bam,
     ]
 
