@@ -41,10 +41,10 @@ from rnarry.nrclip.PipelineControl import *
 @follows(SequenceProcessing.shorttag_trim_collapse)
 @follows(DataPreparation.generate_gsnap_early_filter_index)
 @jobs_limit(1, 'exclusive')
-def align_to_known_contaminants(inputfile, outputfile, sample):
+def align_to_known_contaminants(inputfile, outputfile, sample, mismatches):
     runproc("""
         $GSNAP -D $EXTERNAL_DIR -d $early_filter_prefix -B 4 -A sam \
-            -m $FULLTAG_PREALN_MISMATCHES -t $NUM_THREADS $inputfile | \
+            -m $mismatches -t $NUM_THREADS $inputfile | \
         $GZIP -c - > $outputfile""", outputfile)
 
 
@@ -56,7 +56,7 @@ def align_to_known_contaminants(inputfile, outputfile, sample):
                 Paths.SHORTTAG_SAMPLES))
 @follows(align_to_known_contaminants)
 def filter_contaminants(inputfiles, outputfile, sample):
-    seq_fasta, prealn_sam = inputfile
+    seq_fasta, prealn_sam = inputfiles
 
     with TemporaryFile() as idlist:
         # prepare list of sequence IDs

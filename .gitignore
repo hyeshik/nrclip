@@ -25,6 +25,7 @@ sequences/*-tags.fa
 sequences/full-*
 sequences/short-*
 annotations/*
+derived/*
 prealns/*
 tmp/*
 genomealn/*

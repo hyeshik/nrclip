@@ -82,6 +82,8 @@ BUILD_REFSEQ_INDEX = 'python scripts/build-refseq-index.py'
 BUILD_RFAM_INDEX = 'sh scripts/build-rfam-index.sh'
 SUMMARIZE_ANNOTATIONS = 'python scripts/summarize-annotations.py'
 SAM_ID_FILTER = 'python scripts/sam-id-filter.py'
+PREPARE_FLATDATA_FROM_SAM = 'python scripts/prepare-flatdata-from-sam.py'
+BUILD_POSITIONALDB_GENOME = 'python scripts/build-positionaldb-genome.py'
 
 
 # =================================
@@ -105,12 +107,13 @@ SEQUENCES_DIR = 'sequences'
 GENOMEALN_DIR = 'genomealn'
 ANNOTATIONS_DIR = 'annotations'
 DOWNLOAD_DIR = 'external/downloaded'
+DERIVEDBASES_DIR = 'derived'
 PREALN_DIR = 'prealns'
 TMP_DIR = 'tmp'
 
 ALL_SUBDIRS = [
     EXTERNAL_DIR, SEQUENCES_DIR, GENOMEALN_DIR, DOWNLOAD_DIR,
-    PREALN_DIR, TMP_DIR, ANNOTATIONS_DIR
+    PREALN_DIR, TMP_DIR, ANNOTATIONS_DIR, DERIVEDBASES_DIR,
 ]
 
 
@@ -188,4 +191,10 @@ shorttag_primary_annotation = relfmt(ANNOTATIONS_DIR + '/short-%s.bedintersect.g
 shorttag_annotation = relfmt(ANNOTATIONS_DIR + '/short-%s.anno.gz')
 shorttag_masked_readids = relfmt(ANNOTATIONS_DIR + '/short-%s.masked_ids')
 shorttag_masked_reads = relfmt(SEQUENCES_DIR + '/short-%s-masked.fa')
+
+
+# =================
+# Derived Databases
+
+genomespace_read_database = relfmt(DERIVEDBASES_DIR + '/%s.gspace/done')
 
