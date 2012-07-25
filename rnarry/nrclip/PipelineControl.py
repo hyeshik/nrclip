@@ -49,7 +49,7 @@ def runproc(origcmd, delete_on_error=[], ignore_error=False):
     tmplvalues.update(callerframe[0].f_locals)
     command = cmdtemplate.substitute(tmplvalues).strip()
 
-    print >> sys.stderr, "==> Running " + command
+    print >> sys.stderr, "==> Running [[ " + command + " ]]"
     ret = os.system(command)
 
     if ret != 0 and not ignore_error:

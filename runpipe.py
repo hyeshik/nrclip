@@ -24,7 +24,7 @@
 from ruffus import *
 from rnarry.nrclip import (
     Paths, DataPreparation, SequenceProcessing, ContaminantFilter,
-    SequenceAlignment, SequenceAnnotation)
+    SequenceAlignment, SequenceAnnotation, SequenceMasking)
 from rnarry.nrclip import Options
 from itertools import chain
 import os
@@ -35,6 +35,7 @@ task_modules = [
     ContaminantFilter,
     SequenceAlignment,
     SequenceAnnotation,
+    SequenceMasking,
 ]
 
 all_tasks = list(chain(*[mod.tasks() for mod in task_modules]))
@@ -42,14 +43,17 @@ all_tasks = list(chain(*[mod.tasks() for mod in task_modules]))
 # Simplify module names in diagrams
 for task in all_tasks:
     module = task.__module__.split('.')[-1]
-    task.pipeline_task.display_name = '%s.%s' % (module, task.__name__)
+    task.pipeline_task.display_name = '%s\\n%s' % (module, task.__name__)
 
 # Prepare working directories
 for dirpath in Paths.ALL_SUBDIRS:
     if not os.path.isdir(dirpath):
         os.mkdir(dirpath)
 
-pipeline_printout_graph('flowchart.pdf', 'pdf', all_tasks)
+pipeline_printout_graph('flowchart.pdf', 'pdf', all_tasks,
+                        pipeline_name='Pipeline for LIN28A CLIP-seq and RPF')
+#pipeline_printout_graph('flowchart.dot', 'dot', all_tasks,
+#                        pipeline_name='Pipeline for LIN28A CLIP-seq and RPF')
 pipeline_run(all_tasks, verbose=5, multiprocess=Options.NUM_PARALLEL)
 
 # ex: ts=8 sts=4 sw=4 et

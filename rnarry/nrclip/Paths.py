@@ -80,6 +80,8 @@ PSL2BED = 'pslToBed'
 SAM_MULTIHIT_RESOLVE = 'python scripts/sam-multihit-resolve.py'
 BUILD_REFSEQ_INDEX = 'python scripts/build-refseq-index.py'
 BUILD_RFAM_INDEX = 'sh scripts/build-rfam-index.sh'
+SUMMARIZE_ANNOTATIONS = 'python scripts/summarize-annotations.py'
+SAM_ID_FILTER = 'python scripts/sam-id-filter.py'
 
 
 # =================================
@@ -99,7 +101,7 @@ GTRNADB_URL = 'http://hgdownload.cse.ucsc.edu/goldenPath/%s/database/tRNAs.txt.g
 # Subdirectories
 
 EXTERNAL_DIR = 'external'
-ORIGREAD_DIR = 'sequences'
+SEQUENCES_DIR = 'sequences'
 GENOMEALN_DIR = 'genomealn'
 ANNOTATIONS_DIR = 'annotations'
 DOWNLOAD_DIR = 'external/downloaded'
@@ -107,7 +109,7 @@ PREALN_DIR = 'prealns'
 TMP_DIR = 'tmp'
 
 ALL_SUBDIRS = [
-    EXTERNAL_DIR, ORIGREAD_DIR, GENOMEALN_DIR, DOWNLOAD_DIR,
+    EXTERNAL_DIR, SEQUENCES_DIR, GENOMEALN_DIR, DOWNLOAD_DIR,
     PREALN_DIR, TMP_DIR, ANNOTATIONS_DIR
 ]
 
@@ -144,11 +146,11 @@ compiled_catalog = rel(EXTERNAL_DIR + '/all-annotations.bed.gz')
 # =========================
 # Basic sequence processing
 
-original_sequence_reads = relfmt(ORIGREAD_DIR + '/%s.fq.gz')
-fulltag_quality_filtered_reads = relfmt(ORIGREAD_DIR + '/%s-hq.fq.gz')
-fulltag_collapsed_reads = relfmt(ORIGREAD_DIR + '/%s-total.fa')
-shorttag_trimmed_reads = relfmt(ORIGREAD_DIR + '/%s-trimmed.fq.gz')
-shorttag_tags = relfmt(ORIGREAD_DIR + '/%s-tags.fa')
+original_sequence_reads = relfmt(SEQUENCES_DIR + '/%s.fq.gz')
+fulltag_quality_filtered_reads = relfmt(SEQUENCES_DIR + '/%s-hq.fq.gz')
+fulltag_collapsed_reads = relfmt(SEQUENCES_DIR + '/%s-total.fa')
+shorttag_trimmed_reads = relfmt(SEQUENCES_DIR + '/%s-trimmed.fq.gz')
+shorttag_tags = relfmt(SEQUENCES_DIR + '/%s-tags.fa')
 
 
 # ==================
@@ -157,8 +159,8 @@ shorttag_tags = relfmt(ORIGREAD_DIR + '/%s-tags.fa')
 fulltag_prealn_sam = relfmt(PREALN_DIR + '/full-%s.sam.gz')
 shorttag_prealn_sam = relfmt(PREALN_DIR + '/short-%s.sam.gz')
 
-fulltag_filtered_reads = relfmt(PREALN_DIR + '/full-%s-clean.fa')
-shorttag_filtered_reads = relfmt(PREALN_DIR + '/short-%s-clean.fa')
+fulltag_filtered_reads = relfmt(SEQUENCES_DIR + '/full-%s-clean.fa')
+shorttag_filtered_reads = relfmt(SEQUENCES_DIR + '/short-%s-clean.fa')
 
 
 # ===================
@@ -168,9 +170,19 @@ fulltag_genome_alignment_sam = relfmt(GENOMEALN_DIR + '/%s.sam.gz')
 fulltag_genome_alignment_unsorted_bam = relfmt(GENOMEALN_DIR + '/%s.unsorted.bam')
 fulltag_genome_besthits = relfmt(GENOMEALN_DIR + '/%s-besthits.sam.gz')
 
+fulltag_masked_alignments = relfmt(GENOMEALN_DIR + '/%s-masked.sam.gz')
+
+shorttag_genome_alignment_sam = relfmt(GENOMEALN_DIR + '/short-%s.sam.gz')
+shorttag_genome_alignment_unsorted_bam = relfmt(GENOMEALN_DIR + '/short-%s.unsorted.bam')
 
 # ===========
 # Annotations
 
-fulltag_primary_annotation = relfmt(ANNOTATIONS_DIR + '/%s.anno.gz')
+fulltag_primary_annotation = relfmt(ANNOTATIONS_DIR + '/%s.bedintersect.gz')
+fulltag_annotation = relfmt(ANNOTATIONS_DIR + '/%s.anno.gz')
+fulltag_masked_readids = relfmt(ANNOTATIONS_DIR + '/%s.masked_ids')
+fulltag_masked_reads = relfmt(SEQUENCES_DIR + '/full-%s-masked.fa')
+
+shorttag_primary_annotation = relfmt(ANNOTATIONS_DIR + '/short-%s.bedintersect.gz')
+shorttag_annotation = relfmt(ANNOTATIONS_DIR + '/short-%s.anno.gz')
 

@@ -42,8 +42,48 @@ def annotate_fulltags(inputfiles, outputfile, sample):
         $GZIP -c - > $outputfile""", outputfile)
 
 
+@files(for_each_sample([Paths.fulltag_genome_alignment_sam,
+                        Paths.fulltag_primary_annotation],
+                       Paths.fulltag_annotation,
+                       Paths.ALL_SAMPLES))
+@follows(annotate_fulltags)
+def summarize_fulltags_annotations(inputfiles, outputfile, sample):
+    saminput, bedinput = inputfiles
+    runproc("""
+        $SUMMARIZE_ANNOTATIONS $saminput $bedinput | $GZIP -c - > $outputfile
+        """, outputfile)
+
+
+@files(for_each_sample([Paths.shorttag_genome_alignment_unsorted_bam,
+                        Paths.compiled_catalog],
+                       Paths.shorttag_primary_annotation,
+                       Paths.SHORTTAG_SAMPLES))
+@follows(DataPreparation.compile_catalogs)
+@follows(SequenceAlignment.shorttag_convert_primary_alignment_to_bam)
+def annotate_shorttags(inputfiles, outputfile, sample):
+    inputfile, catalog = inputfiles
+    runproc("""
+        $INTERSECTBED -bed -abam $inputfile -b $catalog -wa -wb | \
+        $GZIP -c - > $outputfile""", outputfile)
+
+
+@files(for_each_sample([Paths.shorttag_genome_alignment_sam,
+                        Paths.shorttag_primary_annotation],
+                       Paths.shorttag_annotation,
+                       Paths.SHORTTAG_SAMPLES))
+@follows(annotate_shorttags)
+def summarize_shorttags_annotations(inputfiles, outputfile, sample):
+    saminput, bedinput = inputfiles
+    runproc("""
+        $SUMMARIZE_ANNOTATIONS $saminput $bedinput | $GZIP -c - > $outputfile
+        """, outputfile)
+
+
 def tasks():
     return [
         annotate_fulltags,
+        summarize_fulltags_annotations,
+        annotate_shorttags,
+        summarize_shorttags_annotations,
     ]
 

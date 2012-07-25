@@ -22,6 +22,8 @@ external/trna.bed.gz
 sequences/*-hq.fq.gz
 sequences/*-total.fa
 sequences/*-tags.fa
+sequences/full-*
+sequences/short-*
 annotations/*
 prealns/*
 tmp/*
