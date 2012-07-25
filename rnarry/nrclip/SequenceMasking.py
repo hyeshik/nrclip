@@ -37,17 +37,17 @@ from rnarry.nrclip.PipelineControl import *
                 Paths.SHORTTAG_SAMPLES))
 @follows(SequenceAnnotation.annotate_sequences)
 def make_list_of_masked_sequences(inputfile, outputfile, sample):
-    runproc("$ZGREP '	[rt]RNA' $inputfile | $CUT -f4 | uniq > $outputfile",
+    runproc("$ZGREP '	[rt]RNA' $inputfile | $CUT -f4 | $UNIQ > $outputfile",
             outputfile)
 
 
 @files(for_each([Paths.fulltag_genome_alignment_sam,
                  Paths.fulltag_masked_readids],
-                Paths.fulltag_masked_alignments,
+                Paths.fulltag_masked_genome_alignments,
                 Paths.ALL_SAMPLES) +
        for_each([Paths.shorttag_genome_alignment_sam,
                  Paths.shorttag_masked_readids],
-                Paths.shorttag_masked_alignments,
+                Paths.shorttag_masked_genome_alignments,
                 Paths.SHORTTAG_SAMPLES))
 @follows(make_list_of_masked_sequences)
 def produce_masked_sam(inputfile, outputfile, sample):
@@ -56,12 +56,10 @@ def produce_masked_sam(inputfile, outputfile, sample):
             outputfile)
 
 
-@files(for_each([Paths.fulltag_filtered_reads,
-                 Paths.fulltag_masked_readids],
+@files(for_each([Paths.fulltag_filtered_reads, Paths.fulltag_masked_readids],
                 Paths.fulltag_masked_reads,
                 Paths.ALL_SAMPLES) +
-       for_each([Paths.shorttag_filtered_reads,
-                 Paths.shorttag_masked_readids],
+       for_each([Paths.shorttag_filtered_reads, Paths.shorttag_masked_readids],
                 Paths.shorttag_masked_reads,
                 Paths.SHORTTAG_SAMPLES))
 @follows(make_list_of_masked_sequences)
@@ -72,10 +70,26 @@ def produce_masked_fasta(inputfile, outputfile, sample):
 
 
 
+@files(for_each(Paths.fulltag_masked_genome_alignments,
+                Paths.fulltag_genome_besthits,
+                Paths.ALL_SAMPLES,
+                [Options.FULLTAG_POSTPROC_ALLOWED_MISMATCHES]) +
+       for_each(Paths.shorttag_masked_genome_alignments,
+                Paths.shorttag_genome_besthits,
+                Paths.SHORTTAG_SAMPLES,
+                [Options.SHORTTAG_POSTPROC_ALLOWED_MISMATCHES]))
+@follows(produce_masked_sam)
+def resolve_genomic_multihits(inputfile, outputfile, sample, mismatches):
+    runproc("""
+        $ZCAT $inputfile | $SAM_MULTIHIT_RESOLVE $mismatches | \
+        $GZIP -c - > $outputfile""", outputfile)
+
+
 def tasks():
     return [
         make_list_of_masked_sequences,
         produce_masked_sam,
         produce_masked_fasta,
+        resolve_genomic_multihits,
     ]
 

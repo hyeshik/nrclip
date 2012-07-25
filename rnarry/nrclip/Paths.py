@@ -169,11 +169,12 @@ shorttag_filtered_reads = relfmt(SEQUENCES_DIR + '/short-%s-filtered.fa')
 fulltag_genome_alignment_sam = relfmt(GENOMEALN_DIR + '/%s.sam.gz')
 fulltag_genome_alignment_unsorted_bam = relfmt(GENOMEALN_DIR + '/%s.unsorted.bam')
 fulltag_genome_besthits = relfmt(GENOMEALN_DIR + '/%s-besthits.sam.gz')
-fulltag_masked_alignments = relfmt(GENOMEALN_DIR + '/%s-masked.sam.gz')
+fulltag_masked_genome_alignments = relfmt(GENOMEALN_DIR + '/%s-masked.sam.gz')
 
 shorttag_genome_alignment_sam = relfmt(GENOMEALN_DIR + '/short-%s.sam.gz')
 shorttag_genome_alignment_unsorted_bam = relfmt(GENOMEALN_DIR + '/short-%s.unsorted.bam')
-shorttag_masked_alignments = relfmt(GENOMEALN_DIR + '/short-%s-masked.sam.gz')
+shorttag_genome_besthits = relfmt(GENOMEALN_DIR + '/short-%s-besthits.sam.gz')
+shorttag_masked_genome_alignments = relfmt(GENOMEALN_DIR + '/short-%s-masked.sam.gz')
 
 # ===========
 # Annotations

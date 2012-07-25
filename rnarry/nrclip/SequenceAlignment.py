@@ -49,17 +49,6 @@ def align_to_genome_sam(inputfile, outputfile, sample, mismatches):
         $GZIP -c - > $outputfile""", outputfile)
 
 
-#@files(for_each(Paths.fulltag_genome_alignment_sam,
-#                Paths.fulltag_genome_besthits,
-#                Paths.ALL_SAMPLES))
-#@follows(fulltag_genome_alignment_sam)
-#def fulltag_genome_resolve_multihit(inputfile, outputfile, sample):
-#    runproc("""
-#        $ZCAT $inputfile | \
-#        $SAM_MULTIHIT_RESOLVE $GENOMEALN_POSTPROC_ALLOWED_MISMATCHES | \
-#        $GZIP -c - > $outputfile""", outputfile)
-
-
 @files(for_each(Paths.fulltag_genome_alignment_sam,
                 Paths.fulltag_genome_alignment_unsorted_bam,
                 Paths.ALL_SAMPLES) +
@@ -74,7 +63,6 @@ def convert_primary_alignment_to_bam(inputfile, outputfile, sample):
 def tasks():
     return [
         align_to_genome_sam,
-        #fulltag_genome_resolve_multihit,
         convert_primary_alignment_to_bam,
     ]
 
