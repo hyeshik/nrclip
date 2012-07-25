@@ -41,7 +41,7 @@ def fulltag_genome_alignment_sam(inputfile, outputfile, sample):
         $GSNAP -D $EXTERNAL_DIR -d $genome_prefix -O -B 4 -A sam \
             --terminal-threshold=9999 -s $splice_index \
             -m $FULLTAG_GENOME_MISMATCHES -t $NUM_THREADS $inputfile | \
-        $GZIP_LT -c - > $outputfile""", outputfile)
+        $GZIP -c - > $outputfile""", outputfile)
 
 
 @files(for_each_sample(Paths.fulltag_genome_alignment_sam,
@@ -52,12 +52,22 @@ def fulltag_genome_resolve_multihit(inputfile, outputfile, sample):
     runproc("""
         $ZCAT $inputfile | \
         $SAM_MULTIHIT_RESOLVE $GENOMEALN_POSTPROC_ALLOWED_MISMATCHES | \
-        $GZIP_LT -c - > $outputfile""", outputfile)
+        $GZIP -c - > $outputfile""", outputfile)
+
+
+@files(for_each_sample(Paths.fulltag_genome_alignment_sam,
+                       Paths.fulltag_genome_alignment_unsorted_bam,
+                       Paths.ALL_SAMPLES))
+@follows(fulltag_genome_alignment_sam)
+@jobs_limit(4, 'diskhogging')
+def fulltag_convert_primary_alignment_to_bam(inputfile, outputfile, sample):
+    runproc("$SAMTOOLS view -bS -o $outputfile $inputfile")
 
 
 def tasks():
     return [
         fulltag_genome_alignment_sam,
         fulltag_genome_resolve_multihit,
+        fulltag_convert_primary_alignment_to_bam,
     ]
 

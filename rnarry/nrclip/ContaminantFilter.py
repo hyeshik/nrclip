@@ -39,7 +39,7 @@ def fulltag_contaminant_alignment(inputfile, outputfile, sample):
     runproc("""
         $GSNAP -D $EXTERNAL_DIR -d $early_filter_prefix -B 4 -A sam \
             -m $FULLTAG_PREALN_MISMATCHES -t $NUM_THREADS $inputfile | \
-        $GZIP_LT -c - > $outputfile""", outputfile)
+        $GZIP -c - > $outputfile""", outputfile)
 
 
 @files(for_each_sample(Paths.shorttag_tags,
@@ -52,7 +52,7 @@ def shorttag_contaminant_alignment(inputfile, outputfile, sample):
     runproc("""
         $GSNAP -D $EXTERNAL_DIR -d $early_filter_prefix -B 4 -A sam \
             -m $SHORTTAG_PREALN_MISMATCHES -t $NUM_THREADS $inputfile | \
-        $GZIP_LT -c - > $outputfile""", outputfile)
+        $GZIP -c - > $outputfile""", outputfile)
 
 
 def _common_filter_contaminant(seq_fasta, prealn_sam, outputfile):

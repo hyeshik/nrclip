@@ -1,4 +1,7 @@
-#!/usr/bin/env python
+#
+# rnarry.nrclip.SequenceAnnotation
+#  - Sequence annotation, classifcation, and related statistics
+#
 #
 # Copyright (C) 2012 Hyeshik Chang
 #
@@ -22,34 +25,25 @@
 #
 
 from ruffus import *
-from rnarry.nrclip import (
-    Paths, DataPreparation, SequenceProcessing, ContaminantFilter,
-    SequenceAlignment, SequenceAnnotation)
-from rnarry.nrclip import Options
-from itertools import chain
-import os
+from rnarry.nrclip import Paths, Options, DataPreparation, SequenceAlignment
+from rnarry.nrclip.PipelineControl import *
 
-task_modules = [
-    DataPreparation,
-    SequenceProcessing,
-    ContaminantFilter,
-    SequenceAlignment,
-    SequenceAnnotation,
-]
 
-all_tasks = list(chain(*[mod.tasks() for mod in task_modules]))
+@files(for_each_sample([Paths.fulltag_genome_alignment_unsorted_bam,
+                        Paths.compiled_catalog],
+                       Paths.fulltag_primary_annotation,
+                       Paths.ALL_SAMPLES))
+@follows(DataPreparation.compile_catalogs)
+@follows(SequenceAlignment.fulltag_convert_primary_alignment_to_bam)
+def annotate_fulltags(inputfiles, outputfile, sample):
+    inputfile, catalog = inputfiles
+    runproc("""
+        $INTERSECTBED -bed -abam $inputfile -b $catalog -wa -wb | \
+        $GZIP -c - > $outputfile""", outputfile)
 
-# Simplify module names in diagrams
-for task in all_tasks:
-    module = task.__module__.split('.')[-1]
-    task.pipeline_task.display_name = '%s.%s' % (module, task.__name__)
 
-# Prepare working directories
-for dirpath in Paths.ALL_SUBDIRS:
-    if not os.path.isdir(dirpath):
-        os.mkdir(dirpath)
+def tasks():
+    return [
+        annotate_fulltags,
+    ]
 
-pipeline_printout_graph('flowchart.pdf', 'pdf', all_tasks)
-pipeline_run(all_tasks, verbose=5, multiprocess=Options.NUM_PARALLEL)
-
-# ex: ts=8 sts=4 sw=4 et

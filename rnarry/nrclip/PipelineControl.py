@@ -126,7 +126,7 @@ def for_each_sample(inputpat, outputpat, samples):
     def instantiate(pat, sample):
         if callable(pat):
             return pat(sample)
-        return [p(sample) for p in pat]
+        return [(p(sample) if callable(p) else p) for p in pat]
 
     return [[instantiate(inputpat, sample),
              instantiate(outputpat, sample), sample]

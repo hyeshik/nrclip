@@ -44,8 +44,7 @@ def relfmt(path):
 AWK = 'awk'
 CUT = 'cut'
 GREP = 'grep'
-GZIP_LT = 'gzip' # for low throughput outputs
-GZIP = 'pigz'
+GZIP = 'gzip'
 SED = 'sed'
 SORT = 'sort'
 TAR = 'tar'
@@ -66,6 +65,8 @@ FASTX_ARTIFACTS_FILTER = 'fastx_artifacts_filter'
 GSNAP = 'gsnap' # from gmap/gsnap
 GMAP_BUILD = 'gmap_build' # from gmap/gsnap
 IIT_STORE = 'iit_store' # from gmap/gsnap
+INTERSECTBED = 'intersectBed' # from bedtools
+SAMTOOLS = 'samtools' # from samtools
 
 #- Jim Kent's UCSC Genome Browser tools
 FASOMERECORDS = 'faSomeRecords'
@@ -100,13 +101,14 @@ GTRNADB_URL = 'http://hgdownload.cse.ucsc.edu/goldenPath/%s/database/tRNAs.txt.g
 EXTERNAL_DIR = 'external'
 ORIGREAD_DIR = 'sequences'
 GENOMEALN_DIR = 'genomealn'
+ANNOTATIONS_DIR = 'annotations'
 DOWNLOAD_DIR = 'external/downloaded'
 PREALN_DIR = 'prealns'
 TMP_DIR = 'tmp'
 
 ALL_SUBDIRS = [
     EXTERNAL_DIR, ORIGREAD_DIR, GENOMEALN_DIR, DOWNLOAD_DIR,
-    PREALN_DIR, TMP_DIR
+    PREALN_DIR, TMP_DIR, ANNOTATIONS_DIR
 ]
 
 
@@ -136,6 +138,7 @@ rfam_fasta = rel(DOWNLOAD_DIR + '/Rfam.fasta.gz')
 rfam_original = rel(DOWNLOAD_DIR + '/Rfam.full.gz')
 rfam_catalog = rel(EXTERNAL_DIR + '/rfam.bed.gz')
 trna_catalog = rel(EXTERNAL_DIR + '/trna.bed.gz')
+compiled_catalog = rel(EXTERNAL_DIR + '/all-annotations.bed.gz')
 
 
 # =========================
@@ -162,5 +165,12 @@ shorttag_filtered_reads = relfmt(PREALN_DIR + '/short-%s-clean.fa')
 # Sequence alignments
 
 fulltag_genome_alignment_sam = relfmt(GENOMEALN_DIR + '/%s.sam.gz')
+fulltag_genome_alignment_unsorted_bam = relfmt(GENOMEALN_DIR + '/%s.unsorted.bam')
 fulltag_genome_besthits = relfmt(GENOMEALN_DIR + '/%s-besthits.sam.gz')
+
+
+# ===========
+# Annotations
+
+fulltag_primary_annotation = relfmt(ANNOTATIONS_DIR + '/%s.anno.gz')
 

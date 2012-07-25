@@ -21,8 +21,8 @@ def process(bedfile, catalogue):
         family = familydescr[fields[3].split(';')[0]]
         if descrfields[1].startswith('mir-'):
             continue
-        fields[3] = '%s|%s' % (family, descrfields[1])
-        print '\t'.join(fields)
+        fields[3] = '%s|%s|%s' % (family, descrfields[1], descrfields[1])
+        print '\t'.join(fields[:6])
 
 if __name__ == '__main__':
     import sys

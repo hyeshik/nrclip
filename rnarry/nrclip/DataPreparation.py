@@ -96,7 +96,7 @@ def download_mirbase_catalog(inputfile, outputfile):
             name = accession_pat.findall(fields[8])[0]
             print >> output, '\t'.join([
                 'chr'+fields[0], str(int(fields[3])-1), fields[4],
-                name, '.', fields[6]
+                'miRNA|%s|%s' % (name, name), '.', fields[6]
             ])
 
 
@@ -126,8 +126,9 @@ def merge_repeatmasker_catalogs(inputfiles, outputfile):
                 continue
 
             print >> output, '%s\t%s\t%s\t%s|%s|%s\t%s\t%s' % (
-                fields[5], fields[6], fields[7], fields[11], fields[12],
-                fields[10], fields[1], fields[9])
+                fields[5], fields[6], fields[7],
+                fields[11], fields[10], fields[12] + '/' + fields[10],
+                fields[1], fields[9])
 
 
 @files(Paths.refgene_ucsc, Paths.refseq_catalog)
@@ -159,6 +160,7 @@ def download_rfam_files(inputfile, outputfiles):
 
 @files([Paths.rfam_fasta, Paths.rfam_original], Paths.rfam_catalog)
 @follows(download_rfam_files)
+@follows(prepare_genome_2bit)
 def prepare_rfam_catalog(inputfiles, outputfile):
     rfamseq, rfamfull = inputfiles
 
@@ -178,7 +180,24 @@ def download_trna_catalog(inputfile, outputfile):
             fields = line[:-1].split('\t')
             print >> output, '\t'.join([
                 fields[1], fields[2], fields[3],
-                'tRNA|tRNA-' + fields[7] + fields[8], fields[5], fields[6]])
+                'tRNA|tRNA-%s%s|tRNA-%s%s' % (
+                    fields[7], fields[8], fields[7], fields[8]),
+                fields[5], fields[6]])
+
+
+@files([
+    Paths.mirbase_catalog, Paths.refseq_catalog, Paths.repeatmasker_catalog,
+    Paths.rfam_catalog, Paths.trna_catalog], Paths.compiled_catalog)
+@follows(download_mirbase_catalog)
+@follows(prepare_refseq_catalog)
+@follows(merge_repeatmasker_catalogs)
+@follows(prepare_rfam_catalog)
+@follows(download_trna_catalog)
+def compile_catalogs(inputfiles, outputfile):
+    inputs = ' '.join(inputfiles)
+    runproc("""
+        $ZCAT $inputs | sort -k1,1 -k2,3n -k4,4 |
+        $GZIP -c - > $outputfile""", outputfile)
 
 
 def tasks():
@@ -198,4 +217,5 @@ def tasks():
         download_rfam_files,
         prepare_rfam_catalog,
         download_trna_catalog,
+        compile_catalogs,
     ]

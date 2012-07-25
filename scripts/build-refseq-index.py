@@ -28,17 +28,28 @@ def parse_refgene(annofile):
             'cdsEnd': int(fields['cdsEnd']),
             'name': fields['name'],
             'chrom': fields['chrom'],
-            'strand': fields['strand']
+            'strand': fields['strand'],
+            'geneName': fields['name2'],
         }
 
+REFSEQ_CLSMAP = {'5': 'UTR5', '3': 'UTR5', 'i': 'intron', 'c': 'CDS'}
 def load_refgene(bedout, refgene):
     def add(e, start, stop, ei, regtype):
         instancename = '%s.%d' % (e['name'], serial)
         annoid = '%s#%d%s' % (instancename, ei, regtype)
 
-        print >> bedout, '\t'.join((
-            e['chrom'], str(start), str(stop), annoid, '.', e['strand']
-        ))
+        if instancename.startswith('NR_') or instancename.startswith('XR_'):
+            cls = 'ncRNA'
+        else:
+            cls = REFSEQ_CLSMAP[regtype]
+
+        commonname = e['geneName'] or e['name']
+        if not commonname.upper().startswith('MIR'):
+            print >> bedout, '\t'.join((
+                e['chrom'], str(start), str(stop),
+                '%s|%s|%s' % (cls, commonname, annoid),
+                '.', e['strand']
+            ))
 
         lengthstat[instancename][regtype] += stop - start
         intervals[instancename][regtype].append((start, stop))
