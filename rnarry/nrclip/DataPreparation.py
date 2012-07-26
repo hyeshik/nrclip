@@ -57,16 +57,34 @@ def generate_gsnap_genome_index(inputfile, outcheck):
             '$inputfile', outcheck)
 
 
+def _download_file(outputpath, url):
+    import urllib
+    print "Downloading %s ..." % url
+    urllib.urlretrieve(url, outputpath)
+
+
 @files(None, Paths.refgene_ucsc)
 @jobs_limit(Options.MAX_PARALLEL_DOWNLOADING, 'download')
 def download_refgene(inputfile, outputfile):
-    runproc('$WGET -O $outputfile $REFGENE_URL', outputfile)
+    _download_file(outputfile, Paths.REFGENE_URL)
+
+
+@files(None, Paths.refflat_ucsc)
+@jobs_limit(Options.MAX_PARALLEL_DOWNLOADING, 'download')
+def download_refflat(inputfile, outputfile):
+    _download_file(outputfile, Paths.REFFLAT_URL)
+
+
+@files(None, Paths.reflink_ucsc)
+@jobs_limit(Options.MAX_PARALLEL_DOWNLOADING, 'download')
+def download_reflink(inputfile, outputfile):
+    _download_file(outputfile, Paths.REFLINK_URL)
 
 
 @files(None, Paths.knowngene_ucsc)
 @jobs_limit(Options.MAX_PARALLEL_DOWNLOADING, 'download')
 def download_knowngene(inputfile, outputfile):
-    runproc('$WGET -O $outputfile $KNOWNGENE_URL', outputfile)
+    _download_file(outputfile, Paths.KNOWNGENE_URL)
 
 
 @files([Paths.refgene_ucsc, Paths.knowngene_ucsc], Paths.splice_index)
@@ -200,6 +218,21 @@ def compile_catalogs(inputfiles, outputfile):
         $GZIP -c - > $outputfile""", outputfile)
 
 
+@files([Paths.refflat_ucsc, Paths.reflink_ucsc], Paths.nr_refseq_db)
+@follows(download_refflat)
+@follows(download_reflink)
+def build_nonredundant_refseq_database(inputfiles, outputfile):
+    refflat, reflink = inputfiles
+    runproc("""
+        $ZCAT $refflat | $SORT -t '\t' -k3,4 -k5,6n | \
+        $BUILD_NONREDUNDANT_REFSEQ $reflink $outputfile""", outputfile)
+
+
+@files(Paths.nr_refseq_db, Paths.nr_refseq_genome_bed)
+@follows(build_nonredundant_refseq_database)
+def make_nonredundant_refseq_genome_bedanno(inputfile, outputfile):
+    runproc("$NRREFSEQ2BED $inputfile | $GZIP -c - > $outputfile", outputfile)
+
 def tasks():
     return [
         generate_gsnap_early_filter_index,
@@ -207,6 +240,8 @@ def tasks():
         extract_genome_sequence,
         generate_gsnap_genome_index,
         download_refgene,
+        download_refflat,
+        download_reflink,
         download_knowngene,
         build_splicesites_index,
         download_mirbase_catalog,
@@ -218,4 +253,6 @@ def tasks():
         prepare_rfam_catalog,
         download_trna_catalog,
         compile_catalogs,
+        build_nonredundant_refseq_database,
+        make_nonredundant_refseq_genome_bedanno,
     ]

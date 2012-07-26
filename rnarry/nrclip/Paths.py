@@ -76,7 +76,7 @@ BLAT = 'blat'
 PSL_CDNAFILTER = 'pslCDnaFilter'
 PSL2BED = 'pslToBed'
 
-#- Local scripts
+#- In-house scripts
 SAM_MULTIHIT_RESOLVE = 'python scripts/sam-multihit-resolve.py'
 BUILD_REFSEQ_INDEX = 'python scripts/build-refseq-index.py'
 BUILD_RFAM_INDEX = 'sh scripts/build-rfam-index.sh'
@@ -84,6 +84,8 @@ SUMMARIZE_ANNOTATIONS = 'python scripts/summarize-annotations.py'
 SAM_ID_FILTER = 'python scripts/sam-id-filter.py'
 PREPARE_FLATDATA_FROM_SAM = 'python scripts/prepare-flatdata-from-sam.py'
 BUILD_POSITIONALDB_GENOME = 'python scripts/build-positionaldb-genome.py'
+BUILD_NONREDUNDANT_REFSEQ = 'python scripts/build-nonredundant-refseq.py'
+NRREFSEQ2BED = 'python scripts/nrrefseq2bed.py'
 
 
 # =================================
@@ -91,6 +93,8 @@ BUILD_POSITIONALDB_GENOME = 'python scripts/build-positionaldb-genome.py'
 
 GENOME_SEQ_URL = 'http://hgdownload.cse.ucsc.edu/goldenPath/%s/bigZips/chromFa.tar.gz' % GENOME
 REFGENE_URL = 'ftp://hgdownload.cse.ucsc.edu/goldenPath/%s/database/refGene.txt.gz' % GENOME
+REFFLAT_URL = 'ftp://hgdownload.cse.ucsc.edu/goldenPath/%s/database/refFlat.txt.gz' % GENOME
+REFLINK_URL = 'ftp://hgdownload.cse.ucsc.edu/goldenPath/%s/database/refLink.txt.gz' % GENOME
 KNOWNGENE_URL = 'ftp://hgdownload.cse.ucsc.edu/goldenPath/%s/database/knownGene.txt.gz' % GENOME
 MIRBASE_URL = 'ftp://mirbase.org/pub/mirbase/18/genomes/%s.gff2' % SPECIES3
 REPEATMASKER_URL = 'http://hgdownload.cse.ucsc.edu/goldenPath/%s/database/chr%s_rmsk.txt.gz'
@@ -131,6 +135,8 @@ genome_index_check = rel('%s/%s/%s.ref123positions' % (
 genome_fasta_zipped = rel('%s/%s.tar.gz' % (EXTERNAL_DIR, genome_prefix))
 genome_twobit = rel('%s/%s.2bit' % (EXTERNAL_DIR, genome_prefix))
 refgene_ucsc = rel(EXTERNAL_DIR + '/refGene.txt.gz')
+refflat_ucsc = rel(EXTERNAL_DIR + '/refFlat.txt.gz')
+reflink_ucsc = rel(EXTERNAL_DIR + '/refLink.txt.gz')
 knowngene_ucsc = rel(EXTERNAL_DIR + '/knownGene.txt.gz')
 splice_index = rel(EXTERNAL_DIR + '/%s/%s.maps/%s.splicesites.iit' % (
                     genome_prefix, genome_prefix, genome_prefix))
@@ -144,6 +150,9 @@ rfam_original = rel(DOWNLOAD_DIR + '/Rfam.full.gz')
 rfam_catalog = rel(EXTERNAL_DIR + '/rfam.bed.gz')
 trna_catalog = rel(EXTERNAL_DIR + '/trna.bed.gz')
 compiled_catalog = rel(EXTERNAL_DIR + '/all-annotations.bed.gz')
+
+nr_refseq_db = rel(EXTERNAL_DIR + '/nrRefSeq.db')
+nr_refseq_genome_bed = rel(EXTERNAL_DIR + '/nrRefSeq-genome.bed.gz')
 
 
 # =========================

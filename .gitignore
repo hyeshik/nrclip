@@ -19,6 +19,10 @@ external/rfam.bed.gz
 external/Rfam.fasta.gz
 external/Rfam.full.gz
 external/trna.bed.gz
+external/nrRefSeq-genome.bed.gz
+external/nrRefSeq.db
+external/refFlat.txt.gz
+external/refLink.txt.gz
 sequences/*-hq.fq.gz
 sequences/*-total.fa
 sequences/*-tags.fa
