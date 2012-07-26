@@ -233,6 +233,7 @@ def build_nonredundant_refseq_database(inputfiles, outputfile):
 def make_nonredundant_refseq_genome_bedanno(inputfile, outputfile):
     runproc("$NRREFSEQ2BED $inputfile | $GZIP -c - > $outputfile", outputfile)
 
+
 def tasks():
     return [
         generate_gsnap_early_filter_index,

@@ -94,7 +94,7 @@ def process(inpf, db, anno):
 
 def split_blocks(entry):
     cdsstart, cdsend = entry['cdsStart'], entry['cdsEnd']
-    leftutrblocks, rightutrblocks, orfblocks = [], [], []
+    leftutrblocks, rightutrblocks, cdsblocks = [], [], []
 
     for exstart, exend in entry['exonBlocks']:
         if exend <= cdsstart:
@@ -110,14 +110,14 @@ def split_blocks(entry):
                 leftutrblocks.append((exstart, eff_cdsstart))
             if eff_cdsstart != eff_cdsend:
                 assert eff_cdsstart < eff_cdsend
-                orfblocks.append((eff_cdsstart, eff_cdsend))
+                cdsblocks.append((eff_cdsstart, eff_cdsend))
             if eff_cdsend != exend:
                 assert eff_cdsend < exend
                 rightutrblocks.append((eff_cdsend, exend))
 
     entry['leftUtrBlocks'] = leftutrblocks
     entry['rightUtrBlocks'] = rightutrblocks
-    entry['orfBlocks'] = orfblocks
+    entry['cdsBlocks'] = cdsblocks
 
 def block_length(blk):
     return sum(en - st for st, en in blk)
@@ -129,11 +129,11 @@ def add_mRNA_block_annotation(entry):
         split_blocks(entry)
         lenleft= block_length(entry['leftUtrBlocks'])
         lenright = block_length(entry['rightUtrBlocks'])
-        lenorf = block_length(entry['orfBlocks'])
+        lencds = block_length(entry['cdsBlocks'])
         if entry['strand'] == '+':
-            entry['partLengths'] = (lenleft, lenorf, lenright)
+            entry['partLengths'] = (lenleft, lencds, lenright)
         else:
-            entry['partLengths'] = (lenright, lenorf, lenleft)
+            entry['partLengths'] = (lenright, lencds, lenleft)
 
     entry['totalLength'] = block_length(entry['exonBlocks'])
 

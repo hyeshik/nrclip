@@ -77,15 +77,17 @@ PSL_CDNAFILTER = 'pslCDnaFilter'
 PSL2BED = 'pslToBed'
 
 #- In-house scripts
-SAM_MULTIHIT_RESOLVE = 'python scripts/sam-multihit-resolve.py'
-BUILD_REFSEQ_INDEX = 'python scripts/build-refseq-index.py'
+PYTHON = 'python'
+SAM_MULTIHIT_RESOLVE = PYTHON + ' scripts/sam-multihit-resolve.py'
+BUILD_REFSEQ_INDEX = PYTHON + ' scripts/build-refseq-index.py'
 BUILD_RFAM_INDEX = 'sh scripts/build-rfam-index.sh'
-SUMMARIZE_ANNOTATIONS = 'python scripts/summarize-annotations.py'
-SAM_ID_FILTER = 'python scripts/sam-id-filter.py'
-PREPARE_FLATDATA_FROM_SAM = 'python scripts/prepare-flatdata-from-sam.py'
-BUILD_POSITIONALDB_GENOME = 'python scripts/build-positionaldb-genome.py'
-BUILD_NONREDUNDANT_REFSEQ = 'python scripts/build-nonredundant-refseq.py'
-NRREFSEQ2BED = 'python scripts/nrrefseq2bed.py'
+SUMMARIZE_ANNOTATIONS = PYTHON + ' scripts/summarize-annotations.py'
+SAM_ID_FILTER = PYTHON + ' scripts/sam-id-filter.py'
+PREPARE_FLATDATA_FROM_SAM = PYTHON + ' scripts/prepare-flatdata-from-sam.py'
+BUILD_POSITIONALDB_GENOME = PYTHON + ' scripts/build-positionaldb-genome.py'
+BUILD_NONREDUNDANT_REFSEQ = PYTHON + ' scripts/build-nonredundant-refseq.py'
+NRREFSEQ2BED = PYTHON + ' scripts/nrrefseq2bed.py'
+COUNT_REFSEQ_IN_GSPACE = PYTHON + ' scripts/count-refseq-in-gspace.py'
 
 
 # =================================
@@ -206,4 +208,5 @@ shorttag_masked_reads = relfmt(SEQUENCES_DIR + '/short-%s-masked.fa')
 # Derived Databases
 
 genomespace_read_database = relfmt(DERIVEDBASES_DIR + '/%s.gspace/done')
+genomespace_refseq_counts = relfmt(DERIVEDBASES_DIR + '/%s.gspace/refseq.pickle')
 

@@ -26,7 +26,7 @@
 
 from ruffus import *
 import os
-from rnarry.nrclip import Paths, Options, SequenceMasking
+from rnarry.nrclip import Paths, Options, SequenceMasking, DataPreparation
 from rnarry.nrclip.PipelineControl import *
 
 
@@ -42,7 +42,20 @@ def build_genomespace_read_database(inputfile, outputfile, sample):
         $BUILD_POSITIONALDB_GENOME $outputdir""", outputfile)
 
 
+@files(for_each(Paths.genomespace_read_database,
+                Paths.genomespace_refseq_counts,
+                Paths.ALL_SAMPLES))
+@follows(build_genomespace_read_database)
+@follows(DataPreparation.build_nonredundant_refseq_database)
+def quantitate_refseq_in_gspace(inputfile, outputfile, sample):
+    gspacedir = os.path.dirname(inputfile)
+    runproc(
+        '$COUNT_REFSEQ_IN_GSPACE $outputfile $nr_refseq_db $gspacedir',
+        outputfile)
+
+
 def tasks():
     return [
         build_genomespace_read_database,
+        quantitate_refseq_in_gspace,
     ]
