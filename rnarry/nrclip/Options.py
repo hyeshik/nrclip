@@ -80,3 +80,6 @@ UCSC_REPEATMASKER_CHROMOSOMES = """
 # These RNAs are annotated by gtRNAdb and/or rfam.
 REPEATMASKER_IGNORE_CLASSES = 'tRNA snRNA scRNA srpRNA'.split()
 
+# Expression quantification settings
+GSPACE_STATS_MINIMUM_RAW_READS = 10
+

@@ -218,14 +218,20 @@ def compile_catalogs(inputfiles, outputfile):
         $GZIP -c - > $outputfile""", outputfile)
 
 
-@files([Paths.refflat_ucsc, Paths.reflink_ucsc], Paths.nr_refseq_db)
+@files([Paths.refflat_ucsc, Paths.reflink_ucsc],
+       [Paths.nr_refseq_db, Paths.nr_refseq_list])
 @follows(download_refflat)
 @follows(download_reflink)
-def build_nonredundant_refseq_database(inputfiles, outputfile):
+def build_nonredundant_refseq_database(inputfiles, outputfiles):
     refflat, reflink = inputfiles
+    dbout, listout = outputfiles
     runproc("""
         $ZCAT $refflat | $SORT -t '\t' -k3,4 -k5,6n | \
-        $BUILD_NONREDUNDANT_REFSEQ $reflink $outputfile""", outputfile)
+        $BUILD_NONREDUNDANT_REFSEQ $reflink $dbout""", dbout)
+
+    import shelve
+    db = shelve.open(dbout, 'r')
+    print >> open(listout, 'w'), '\n'.join(sorted(db.keys()))
 
 
 @files(Paths.nr_refseq_db, Paths.nr_refseq_genome_bed)

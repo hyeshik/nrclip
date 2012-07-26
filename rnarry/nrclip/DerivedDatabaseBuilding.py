@@ -54,8 +54,22 @@ def quantitate_refseq_in_gspace(inputfile, outputfile, sample):
         outputfile)
 
 
+@files([Paths.nr_refseq_list] +
+       [Paths.genomespace_refseq_counts(sample)
+        for sample in Paths.ALL_SAMPLES],
+       Paths.genomespace_all_expressed_transcripts)
+@follows(quantitate_refseq_in_gspace)
+def make_list_of_expressed_transcripts(inputfiles, outputfile):
+    inputlist = ' '.join(inputfiles)
+
+    runproc("""
+        $ENV MINDEPTH=$GSPACE_STATS_MINIMUM_RAW_READS \
+        $REFSEQCNT_PICK_EXPRESSED $inputlist > $outputfile""", outputfile)
+
+
 def tasks():
     return [
         build_genomespace_read_database,
         quantitate_refseq_in_gspace,
+        make_list_of_expressed_transcripts,
     ]

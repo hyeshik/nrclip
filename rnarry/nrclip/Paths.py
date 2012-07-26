@@ -43,6 +43,7 @@ def relfmt(path):
 #- Generic UNIX command line tools
 AWK = 'awk'
 CUT = 'cut'
+ENV = 'env'
 GREP = 'grep'
 GZIP = 'gzip'
 SED = 'sed'
@@ -88,6 +89,7 @@ BUILD_POSITIONALDB_GENOME = PYTHON + ' scripts/build-positionaldb-genome.py'
 BUILD_NONREDUNDANT_REFSEQ = PYTHON + ' scripts/build-nonredundant-refseq.py'
 NRREFSEQ2BED = PYTHON + ' scripts/nrrefseq2bed.py'
 COUNT_REFSEQ_IN_GSPACE = PYTHON + ' scripts/count-refseq-in-gspace.py'
+REFSEQCNT_PICK_EXPRESSED = PYTHON + ' scripts/refseqcnt-pick-expressed.py'
 
 
 # =================================
@@ -154,6 +156,7 @@ trna_catalog = rel(EXTERNAL_DIR + '/trna.bed.gz')
 compiled_catalog = rel(EXTERNAL_DIR + '/all-annotations.bed.gz')
 
 nr_refseq_db = rel(EXTERNAL_DIR + '/nrRefSeq.db')
+nr_refseq_list = rel(EXTERNAL_DIR + '/nrRefSeq.list')
 nr_refseq_genome_bed = rel(EXTERNAL_DIR + '/nrRefSeq-genome.bed.gz')
 
 
@@ -209,4 +212,5 @@ shorttag_masked_reads = relfmt(SEQUENCES_DIR + '/short-%s-masked.fa')
 
 genomespace_read_database = relfmt(DERIVEDBASES_DIR + '/%s.gspace/done')
 genomespace_refseq_counts = relfmt(DERIVEDBASES_DIR + '/%s.gspace/refseq.pickle')
+genomespace_all_expressed_transcripts = rel(DERIVEDBASES_DIR + '/gspace-expressed-transcripts')
 

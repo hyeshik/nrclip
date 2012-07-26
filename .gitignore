@@ -9,7 +9,12 @@ external/mm9/*
 external/mm9.2bit
 external/mm9.fa
 external/mm9.tar.gz
+external/nrRefSeq.db
+external/nrRefSeq-genome.bed.gz
+external/nrRefSeq.list
+external/refFlat.txt.gz
 external/refGene.txt.gz
+external/refLink.txt.gz
 external/refseq.bed.gz
 external/refseq-instances.pickle
 external/refseq-intervals.pickle
@@ -19,10 +24,6 @@ external/rfam.bed.gz
 external/Rfam.fasta.gz
 external/Rfam.full.gz
 external/trna.bed.gz
-external/nrRefSeq-genome.bed.gz
-external/nrRefSeq.db
-external/refFlat.txt.gz
-external/refLink.txt.gz
 sequences/*-hq.fq.gz
 sequences/*-total.fa
 sequences/*-tags.fa
