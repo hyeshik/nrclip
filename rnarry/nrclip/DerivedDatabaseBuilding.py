@@ -67,9 +67,34 @@ def make_list_of_expressed_transcripts(inputfiles, outputfile):
         $REFSEQCNT_PICK_EXPRESSED $inputlist > $outputfile""", outputfile)
 
 
+@files([Paths.nr_refseq_db, Paths.genomespace_all_expressed_transcripts,
+        Paths.genome_fasta,
+        Paths.genomespace_read_database(Options.SNPREF_SAMPLE)],
+       [Paths.reftranscriptome_sequences, Paths.reftranscriptome_cds_anno])
+@follows(make_list_of_expressed_transcripts)
+def generate_SNPfixed_transcriptome(inputfiles, outputfiles):
+    nrdb, expressed, genomeseq, gspace = inputfiles
+    outseq, outanno = outputfiles
+
+    runproc("""
+        $GENFASTA_MUTATED_TRANSCRIPTOME $nrdb $expressed $genomeseq $gspace \
+            $outseq $outanno""", outputfiles)
+    runproc("$SAMTOOLS faidx $outseq", outputfiles)
+    runproc("$FASIZE -detailed $outseq > $outseq.size", outputfiles)
+
+
+@files(Paths.reftranscriptome_sequences, Paths.reftranscriptome_gmap_index)
+@follows(generate_SNPfixed_transcriptome)
+def generate_gsnap_transcriptome_index(inputfile, outcheck):
+    runproc('$GMAP_BUILD -d $reftranscriptome_dbname -D $REFTRANSCRIPTOME_DIR '
+            '-k 12 $inputfile', outcheck)
+
+
 def tasks():
     return [
         build_genomespace_read_database,
         quantitate_refseq_in_gspace,
         make_list_of_expressed_transcripts,
+        generate_SNPfixed_transcriptome,
+        generate_gsnap_transcriptome_index,
     ]

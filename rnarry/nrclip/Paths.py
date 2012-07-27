@@ -76,6 +76,7 @@ FA2TWOBIT = 'faToTwoBit'
 BLAT = 'blat'
 PSL_CDNAFILTER = 'pslCDnaFilter'
 PSL2BED = 'pslToBed'
+FASIZE = 'faSize'
 
 #- In-house scripts
 PYTHON = 'python'
@@ -90,6 +91,7 @@ BUILD_NONREDUNDANT_REFSEQ = PYTHON + ' scripts/build-nonredundant-refseq.py'
 NRREFSEQ2BED = PYTHON + ' scripts/nrrefseq2bed.py'
 COUNT_REFSEQ_IN_GSPACE = PYTHON + ' scripts/count-refseq-in-gspace.py'
 REFSEQCNT_PICK_EXPRESSED = PYTHON + ' scripts/refseqcnt-pick-expressed.py'
+GENFASTA_MUTATED_TRANSCRIPTOME = PYTHON = ' scripts/genfasta-mutated-transcriptome.py'
 
 
 # =================================
@@ -116,12 +118,14 @@ GENOMEALN_DIR = 'genomealn'
 ANNOTATIONS_DIR = 'annotations'
 DOWNLOAD_DIR = 'external/downloaded'
 DERIVEDBASES_DIR = 'derived'
+REFTRANSCRIPTOME_DIR = 'derived/reference'
 PREALN_DIR = 'prealns'
 TMP_DIR = 'tmp'
 
 ALL_SUBDIRS = [
     EXTERNAL_DIR, SEQUENCES_DIR, GENOMEALN_DIR, DOWNLOAD_DIR,
     PREALN_DIR, TMP_DIR, ANNOTATIONS_DIR, DERIVEDBASES_DIR,
+    REFTRANSCRIPTOME_DIR,
 ]
 
 
@@ -211,6 +215,13 @@ shorttag_masked_reads = relfmt(SEQUENCES_DIR + '/short-%s-masked.fa')
 # Derived Databases
 
 genomespace_read_database = relfmt(DERIVEDBASES_DIR + '/%s.gspace/done')
+genomespace_read_database_dir = relfmt(DERIVEDBASES_DIR + '/%s.gspace')
 genomespace_refseq_counts = relfmt(DERIVEDBASES_DIR + '/%s.gspace/refseq.pickle')
 genomespace_all_expressed_transcripts = rel(DERIVEDBASES_DIR + '/gspace-expressed-transcripts')
+
+reftranscriptome_sequences = rel(REFTRANSCRIPTOME_DIR + '/reftranscriptome.fa')
+reftranscriptome_cds_anno = rel(REFTRANSCRIPTOME_DIR + '/reftranscriptome.bed')
+reftranscriptome_gmap_index = rel(REFTRANSCRIPTOME_DIR + '/reftranscriptome/reftranscriptome.genomecomp')
+reftranscriptome_dbname = 'reftranscriptome'
+
 
