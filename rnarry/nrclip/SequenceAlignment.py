@@ -29,11 +29,11 @@ from rnarry.nrclip import Paths, Options, ContaminantFilter, DataPreparation
 from rnarry.nrclip.PipelineControl import *
 
 
-@files(for_each(Paths.fulltag_filtered_reads,
+@files(for_each([Paths.fulltag_filtered_reads, Paths.genome_index_check],
                 Paths.fulltag_genome_alignment_sam,
                 Paths.ALL_SAMPLES,
                 [Options.FULLTAG_GENOME_MISMATCHES]) +
-       for_each(Paths.shorttag_filtered_reads,
+       for_each([Paths.shorttag_filtered_reads, Paths.genome_index_check],
                 Paths.shorttag_genome_alignment_sam,
                 Paths.SHORTTAG_SAMPLES,
                 [Options.SHORTTAG_GENOME_MISMATCHES]))
@@ -41,11 +41,13 @@ from rnarry.nrclip.PipelineControl import *
 @follows(DataPreparation.build_splicesites_index)
 @follows(ContaminantFilter.filter_contaminants)
 @jobs_limit(1, 'exclusive')
-def align_to_genome_sam(inputfile, outputfile, sample, mismatches):
+def align_to_genome_sam(inputfiles, outputfile, sample, mismatches):
+    reads, idxchk = inputfiles
+
     runproc("""
         $GSNAP -D $EXTERNAL_DIR -d $genome_prefix -O -B 4 -A sam \
             --terminal-threshold=9999 -s $splice_index \
-            -m $mismatches -t $NUM_THREADS $inputfile | \
+            -m $mismatches -t $NUM_THREADS $reads | \
         $GZIP -c - > $outputfile""", outputfile)
 
 

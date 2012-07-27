@@ -119,13 +119,14 @@ ANNOTATIONS_DIR = 'annotations'
 DOWNLOAD_DIR = 'external/downloaded'
 DERIVEDBASES_DIR = 'derived'
 REFTRANSCRIPTOME_DIR = 'derived/reference'
+TRANSCRIPTOMEALN_DIR = 'transcriptomealn'
 PREALN_DIR = 'prealns'
 TMP_DIR = 'tmp'
 
 ALL_SUBDIRS = [
     EXTERNAL_DIR, SEQUENCES_DIR, GENOMEALN_DIR, DOWNLOAD_DIR,
     PREALN_DIR, TMP_DIR, ANNOTATIONS_DIR, DERIVEDBASES_DIR,
-    REFTRANSCRIPTOME_DIR,
+    REFTRANSCRIPTOME_DIR, TRANSCRIPTOMEALN_DIR,
 ]
 
 
@@ -224,4 +225,9 @@ reftranscriptome_cds_anno = rel(REFTRANSCRIPTOME_DIR + '/reftranscriptome.bed')
 reftranscriptome_gmap_index = rel(REFTRANSCRIPTOME_DIR + '/reftranscriptome/reftranscriptome.genomecomp')
 reftranscriptome_dbname = 'reftranscriptome'
 
+
+# ===========================
+# Anti-transcriptome Analyses
+
+fulltag_transcriptome_alignment_sam = relfmt(TRANSCRIPTOMEALN_DIR + '/full-%s.sam.gz')
 
