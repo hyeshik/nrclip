@@ -65,9 +65,22 @@ def resolve_transcriptomic_multihits(inputfile, outputfile, sample, mismatches):
         $GZIP -c - > $outputfile""", outputfile)
 
 
+@files(for_each(Paths.fulltag_transcriptomic_besthits_sam,
+                Paths.tspace_read_database,
+                Paths.FULLTAG_SAMPLES))
+@follows(resolve_transcriptomic_multihits)
+def build_tspace_read_database(inputfile, outputfile, sample):
+    runproc("""
+        $PREPARE_FLATDATA_FROM_SAM $inputfile -tr | \
+        $SORT -k3,4 -k5,5n | \
+        $BUILD_POSITIONALDB_TRANSCRIPTOME $nr_refseq_db $outputfile""",
+        outputfile)
+
+
 def tasks():
     return [
         align_to_transcriptome_sam,
         resolve_transcriptomic_multihits,
+        build_tspace_read_database,
     ]
 

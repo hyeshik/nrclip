@@ -87,6 +87,7 @@ SUMMARIZE_ANNOTATIONS = PYTHON + ' scripts/summarize-annotations.py'
 SAM_ID_FILTER = PYTHON + ' scripts/sam-id-filter.py'
 PREPARE_FLATDATA_FROM_SAM = PYTHON + ' scripts/prepare-flatdata-from-sam.py'
 BUILD_POSITIONALDB_GENOME = PYTHON + ' scripts/build-positionaldb-genome.py'
+BUILD_POSITIONALDB_TRANSCRIPTOME = PYTHON + ' scripts/build-positionaldb-transcriptome.py'
 BUILD_NONREDUNDANT_REFSEQ = PYTHON + ' scripts/build-nonredundant-refseq.py'
 NRREFSEQ2BED = PYTHON + ' scripts/nrrefseq2bed.py'
 COUNT_REFSEQ_IN_GSPACE = PYTHON + ' scripts/count-refseq-in-gspace.py'
@@ -231,4 +232,5 @@ reftranscriptome_dbname = 'reftranscriptome'
 
 fulltag_transcriptome_alignment_sam = relfmt(TRANSCRIPTOMEALN_DIR + '/full-%s.sam.gz')
 fulltag_transcriptomic_besthits_sam = relfmt(TRANSCRIPTOMEALN_DIR + '/full-%s-besthits.sam.gz')
+tspace_read_database = relfmt(TRANSCRIPTOMEALN_DIR + '/%s.tspace')
 
