@@ -47,20 +47,27 @@ def align_to_transcriptome_sam(inputfiles, outputfile, sample, mismatches):
         $GZIP -c - > $outputfile""", outputfile)
 
 
-#@files(for_each(Paths.fulltag_genome_alignment_sam,
-#                Paths.fulltag_genome_alignment_unsorted_bam,
-#                Paths.ALL_SAMPLES) +
-#       for_each(Paths.shorttag_genome_alignment_sam,
-#                Paths.shorttag_genome_alignment_unsorted_bam,
-#                Paths.SHORTTAG_SAMPLES))
-#@follows(align_to_genome_sam)
-#def convert_primary_alignment_to_bam(inputfile, outputfile, sample):
-#    runproc("$SAMTOOLS view -bS -o $outputfile $inputfile")
+@files(for_each(Paths.fulltag_transcriptome_alignment_sam,
+                Paths.fulltag_transcriptomic_besthits_sam,
+                Paths.FULLTAG_SAMPLES,
+                [Options.FULLTAG_POSTPROC_ALLOWED_MISMATCHES]))
+@follows(align_to_transcriptome_sam)
+def resolve_transcriptomic_multihits(inputfile, outputfile, sample, mismatches):
+    runproc("""
+        $ZCAT $inputfile | \
+        $AWK -F'\t' '
+            /^@/ { print $$0; }
+            /^[^@]/ {
+                if (and($$2, 16) == 0)
+                    print $$0;
+            }' | \
+        $SAM_MULTIHIT_RESOLVE $mismatches | \
+        $GZIP -c - > $outputfile""", outputfile)
 
 
 def tasks():
     return [
         align_to_transcriptome_sam,
-        #convert_primary_alignment_to_bam,
+        resolve_transcriptomic_multihits,
     ]
 

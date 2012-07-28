@@ -41,7 +41,7 @@ def relfmt(path):
 # External tool aliases
 
 #- Generic UNIX command line tools
-AWK = 'awk'
+AWK = 'gawk'
 CUT = 'cut'
 ENV = 'env'
 GREP = 'grep'
@@ -230,4 +230,5 @@ reftranscriptome_dbname = 'reftranscriptome'
 # Anti-transcriptome Analyses
 
 fulltag_transcriptome_alignment_sam = relfmt(TRANSCRIPTOMEALN_DIR + '/full-%s.sam.gz')
+fulltag_transcriptomic_besthits_sam = relfmt(TRANSCRIPTOMEALN_DIR + '/full-%s-besthits.sam.gz')
 
