@@ -25,7 +25,7 @@ from ruffus import *
 from rnarry.nrclip import (
     Paths, DataPreparation, SequenceProcessing, ContaminantFilter,
     SequenceAlignment, SequenceAnnotation, SequenceMasking,
-    DerivedDatabaseBuilding, TranscriptomeAnalysis)
+    DerivedDatabaseBuilding, TranscriptomeAnalysis, GeneralStatistics)
 from rnarry.nrclip import Options
 from itertools import chain
 import os
@@ -39,6 +39,7 @@ task_modules = [
     SequenceMasking,
     DerivedDatabaseBuilding,
     TranscriptomeAnalysis,
+    GeneralStatistics
 ]
 
 all_tasks = list(chain(*[mod.tasks() for mod in task_modules]))

@@ -92,7 +92,8 @@ BUILD_NONREDUNDANT_REFSEQ = PYTHON + ' scripts/build-nonredundant-refseq.py'
 NRREFSEQ2BED = PYTHON + ' scripts/nrrefseq2bed.py'
 COUNT_REFSEQ_IN_GSPACE = PYTHON + ' scripts/count-refseq-in-gspace.py'
 REFSEQCNT_PICK_EXPRESSED = PYTHON + ' scripts/refseqcnt-pick-expressed.py'
-GENFASTA_MUTATED_TRANSCRIPTOME = PYTHON = ' scripts/genfasta-mutated-transcriptome.py'
+GENFASTA_MUTATED_TRANSCRIPTOME = PYTHON + ' scripts/genfasta-mutated-transcriptome.py'
+STATS_CLIP_NRREFSEQ_ENRICHED = PYTHON + ' scripts/clip-nrrefseq-enriched.py'
 
 
 # =================================
@@ -120,6 +121,7 @@ ANNOTATIONS_DIR = 'annotations'
 DOWNLOAD_DIR = 'external/downloaded'
 DERIVEDBASES_DIR = 'derived'
 REFTRANSCRIPTOME_DIR = 'derived/reference'
+STATISTICS_DIR = 'stats'
 TRANSCRIPTOMEALN_DIR = 'transcriptomealn'
 PREALN_DIR = 'prealns'
 TMP_DIR = 'tmp'
@@ -127,7 +129,7 @@ TMP_DIR = 'tmp'
 ALL_SUBDIRS = [
     EXTERNAL_DIR, SEQUENCES_DIR, GENOMEALN_DIR, DOWNLOAD_DIR,
     PREALN_DIR, TMP_DIR, ANNOTATIONS_DIR, DERIVEDBASES_DIR,
-    REFTRANSCRIPTOME_DIR, TRANSCRIPTOMEALN_DIR,
+    REFTRANSCRIPTOME_DIR, TRANSCRIPTOMEALN_DIR, STATISTICS_DIR,
 ]
 
 
@@ -233,4 +235,10 @@ reftranscriptome_dbname = 'reftranscriptome'
 fulltag_transcriptome_alignment_sam = relfmt(TRANSCRIPTOMEALN_DIR + '/full-%s.sam.gz')
 fulltag_transcriptomic_besthits_sam = relfmt(TRANSCRIPTOMEALN_DIR + '/full-%s-besthits.sam.gz')
 tspace_read_database = relfmt(TRANSCRIPTOMEALN_DIR + '/%s.tspace')
+
+
+# ==========
+# Statistics
+
+clip_enrichment_summary = rel(STATISTICS_DIR + '/clip-refseq-enrichment.csv')
 
