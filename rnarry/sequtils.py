@@ -27,10 +27,12 @@ __all__ = [
     'reverse_complement',
     'iter_windowed',
     'iter_windowed_str',
+    'get_first_sequence_length',
 ]
 
 from Bio import SeqIO
 import string
+import gzip
 from collections import deque
 import os
 import re
@@ -98,4 +100,11 @@ def iter_windowed(it, width):
 def iter_windowed_str(it, width):
     for r in iter_windowed(it, width):
         yield ''.join(r)
+
+def get_first_sequence_length(path, format='fastq-illumina', gzipped=True):
+    if gzipped:
+        opener = gzip.open
+    else:
+        opener = open
+    return len(SeqIO.parse(opener(path), format=format).next().seq)
 

@@ -81,6 +81,7 @@ FASIZE = 'faSize'
 #- In-house scripts
 PYTHON = 'python'
 SAM_MULTIHIT_RESOLVE = PYTHON + ' scripts/sam-multihit-resolve.py'
+GMAP_MULTIHIT_RESOLVE = PYTHON + ' scripts/gmap-multihit-resolve.py'
 BUILD_REFSEQ_INDEX = PYTHON + ' scripts/build-refseq-index.py'
 BUILD_RFAM_INDEX = 'sh scripts/build-rfam-index.sh'
 SUMMARIZE_ANNOTATIONS = PYTHON + ' scripts/summarize-annotations.py'
@@ -94,6 +95,9 @@ COUNT_REFSEQ_IN_GSPACE = PYTHON + ' scripts/count-refseq-in-gspace.py'
 REFSEQCNT_PICK_EXPRESSED = PYTHON + ' scripts/refseqcnt-pick-expressed.py'
 GENFASTA_MUTATED_TRANSCRIPTOME = PYTHON + ' scripts/genfasta-mutated-transcriptome.py'
 STATS_CLIP_NRREFSEQ_ENRICHED = PYTHON + ' scripts/clip-nrrefseq-enriched.py'
+STATS_READ_CLASS_PROPORTION = PYTHON + ' scripts/stats-read-class-proportion.py'
+STATS_READ_CLASS_ADD_FILTERED = 'sh scripts/stats-classstat-addprealns.sh'
+GMAP_ERROR_PROFILE = PYTHON + ' scripts/gmap-error-profile.py'
 
 
 # =================================
@@ -124,12 +128,14 @@ REFTRANSCRIPTOME_DIR = 'derived/reference'
 STATISTICS_DIR = 'stats'
 TRANSCRIPTOMEALN_DIR = 'transcriptomealn'
 PREALN_DIR = 'prealns'
+ERRORANALYSIS_DIR = 'erroranalysis'
 TMP_DIR = 'tmp'
 
 ALL_SUBDIRS = [
     EXTERNAL_DIR, SEQUENCES_DIR, GENOMEALN_DIR, DOWNLOAD_DIR,
     PREALN_DIR, TMP_DIR, ANNOTATIONS_DIR, DERIVEDBASES_DIR,
     REFTRANSCRIPTOME_DIR, TRANSCRIPTOMEALN_DIR, STATISTICS_DIR,
+    ERRORANALYSIS_DIR,
 ]
 
 
@@ -234,11 +240,20 @@ reftranscriptome_dbname = 'reftranscriptome'
 
 fulltag_transcriptome_alignment_sam = relfmt(TRANSCRIPTOMEALN_DIR + '/full-%s.sam.gz')
 fulltag_transcriptomic_besthits_sam = relfmt(TRANSCRIPTOMEALN_DIR + '/full-%s-besthits.sam.gz')
+fulltag_transcriptome_alignment_gmap = relfmt(TRANSCRIPTOMEALN_DIR + '/full-%s.gmap.gz')
+fulltag_transcriptomic_besthits_gmap = relfmt(TRANSCRIPTOMEALN_DIR + '/full-%s-besthits.gmap.gz')
 tspace_read_database = relfmt(TRANSCRIPTOMEALN_DIR + '/%s.tspace')
+
+
+# ==============
+# Error Analyses
+
+error_profile_read_level = relfmt(ERRORANALYSIS_DIR + '/%s-readerror.pickle')
 
 
 # ==========
 # Statistics
 
 clip_enrichment_summary = rel(STATISTICS_DIR + '/clip-refseq-enrichment.csv')
+total_read_class_stats = relfmt(STATISTICS_DIR + '/classprop.%s.csv')
 

@@ -47,12 +47,29 @@ def align_to_transcriptome_sam(inputfiles, outputfile, sample, mismatches):
         $GZIP -c - > $outputfile""", outputfile)
 
 
+@files(for_each([Paths.fulltag_masked_reads, Paths.reftranscriptome_gmap_index],
+                Paths.fulltag_transcriptome_alignment_gmap,
+                Paths.FULLTAG_SAMPLES,
+                [Options.FULLTAG_TRANSCRIPTOME_MISMATCHES]))
+@follows(DerivedDatabaseBuilding.generate_gsnap_transcriptome_index)
+@follows(SequenceMasking.produce_masked_fasta)
+@jobs_limit(1, 'exclusive')
+def align_to_transcriptome_gmap(inputfiles, outputfile, sample, mismatches):
+    reads, indexcheck = inputfiles
+
+    runproc("""
+        $GSNAP -D $REFTRANSCRIPTOME_DIR -d $reftranscriptome_dbname -O -B 4 \
+            --terminal-threshold=999999 --trim-mismatch-score=0 \
+            -m $mismatches -t $NUM_THREADS $reads | \
+        $GZIP -c - > $outputfile""", outputfile)
+
+
 @files(for_each(Paths.fulltag_transcriptome_alignment_sam,
                 Paths.fulltag_transcriptomic_besthits_sam,
                 Paths.FULLTAG_SAMPLES,
                 [Options.FULLTAG_POSTPROC_ALLOWED_MISMATCHES]))
 @follows(align_to_transcriptome_sam)
-def resolve_transcriptomic_multihits(inputfile, outputfile, sample, mismatches):
+def resolve_transcriptomic_multihits_sam(inputfile, outputfile, sample, mismatches):
     runproc("""
         $ZCAT $inputfile | \
         $AWK -F'\t' '
@@ -65,10 +82,22 @@ def resolve_transcriptomic_multihits(inputfile, outputfile, sample, mismatches):
         $GZIP -c - > $outputfile""", outputfile)
 
 
+@files(for_each(Paths.fulltag_transcriptome_alignment_gmap,
+                Paths.fulltag_transcriptomic_besthits_gmap,
+                Paths.FULLTAG_SAMPLES,
+                [Options.FULLTAG_POSTPROC_ALLOWED_MISMATCHES]))
+@follows(align_to_transcriptome_gmap)
+def resolve_transcriptomic_multihits_gmap(inputfile, outputfile, gmapple, mismatches):
+    runproc("""
+        $ZCAT $inputfile | \
+        $GMAP_MULTIHIT_RESOLVE $mismatches -tr | \
+        $GZIP -c - > $outputfile""", outputfile)
+
+
 @files(for_each(Paths.fulltag_transcriptomic_besthits_sam,
                 Paths.tspace_read_database,
                 Paths.FULLTAG_SAMPLES))
-@follows(resolve_transcriptomic_multihits)
+@follows(resolve_transcriptomic_multihits_sam)
 def build_tspace_read_database(inputfile, outputfile, sample):
     runproc("""
         $PREPARE_FLATDATA_FROM_SAM $inputfile -tr | \
@@ -80,7 +109,9 @@ def build_tspace_read_database(inputfile, outputfile, sample):
 def tasks():
     return [
         align_to_transcriptome_sam,
-        resolve_transcriptomic_multihits,
+        align_to_transcriptome_gmap,
+        resolve_transcriptomic_multihits_sam,
+        resolve_transcriptomic_multihits_gmap,
         build_tspace_read_database,
     ]
 

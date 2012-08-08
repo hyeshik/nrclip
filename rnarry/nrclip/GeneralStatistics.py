@@ -26,7 +26,9 @@
 
 from ruffus import *
 import os
-from rnarry.nrclip import Paths, Options, DerivedDatabaseBuilding
+from rnarry.nrclip import (
+    Paths, Options, DerivedDatabaseBuilding, SequenceAnnotation,
+    ContaminantFilter)
 from rnarry.nrclip.PipelineControl import *
 
 
@@ -47,7 +49,21 @@ def clip_refseq_enrichment_statistics(inputfiles, outputfile):
             > $outputfile""", outputfile)
 
 
+@files(for_each([Paths.fulltag_annotation, Paths.fulltag_prealn_sam],
+                Paths.total_read_class_stats, Options.ALL_SAMPLES))
+@follows(SequenceAnnotation.summarize_annotations)
+@follows(ContaminantFilter.align_to_known_contaminants)
+def total_read_classification_statistics(inputfiles, outputfile, sample):
+    annofile, prealnfile = inputfiles
+
+    with TemporaryFile() as tmpstats:
+        runproc("$STATS_READ_CLASS_PROPORTION $annofile > $tmpstats")
+        runproc("$STATS_READ_CLASS_ADD_FILTERED $tmpstats $prealnfile "
+                "> $outputfile", outputfile)
+
+
 def tasks():
     return [
         clip_refseq_enrichment_statistics,
+        total_read_classification_statistics,
     ]
