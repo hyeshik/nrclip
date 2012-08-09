@@ -210,7 +210,7 @@ class SAMParser(object):
             self.samfile = samfile
 
         if use_slider:
-            from rnarryng import batchutils
+            from rnarry import batchutils
             self.samfile = batchutils.slider_file(self.samfile)
 
         self.samfile = QueueableLineReader(self.samfile)
