@@ -98,6 +98,7 @@ STATS_CLIP_NRREFSEQ_ENRICHED = PYTHON + ' scripts/clip-nrrefseq-enriched.py'
 STATS_READ_CLASS_PROPORTION = PYTHON + ' scripts/stats-read-class-proportion.py'
 STATS_READ_CLASS_ADD_FILTERED = 'sh scripts/stats-classstat-addprealns.sh'
 GMAP_ERROR_PROFILE = PYTHON + ' scripts/gmap-error-profile.py'
+SUMMARIZE_ERROR_PROFILE = PYTHON + ' scripts/summarize-error-profile.py'
 
 
 # =================================
@@ -249,6 +250,7 @@ tspace_read_database = relfmt(TRANSCRIPTOMEALN_DIR + '/%s.tspace')
 # Error Analyses
 
 error_profile_read_level = relfmt(ERRORANALYSIS_DIR + '/%s-readerror.pickle')
+error_profile_summarized = relfmt(ERRORANALYSIS_DIR + '/%s-error_profile.pickle')
 
 
 # ==========

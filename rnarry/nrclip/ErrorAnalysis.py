@@ -39,12 +39,21 @@ def count_alignment_errors(inputfiles, outputfile, sample):
     mapping, origseqs = inputfiles
     readlength = get_first_sequence_length(origseqs)
 
-    runproc("""
-        $GMAP_ERROR_PROFILE $mapping $outputfile $readlength""", outputfile)
+    runproc('$GMAP_ERROR_PROFILE $mapping $outputfile $readlength',
+            outputfile)
+
+
+@files(for_each(Paths.error_profile_read_level,
+                Paths.error_profile_summarized,
+                Paths.ALLCLIP_SAMPLES))
+@follows(count_alignment_errors)
+def summarize_error_profile(inputfile, outputfile, sample):
+    runproc('$SUMMARIZE_ERROR_PROFILE $inputfile $outputfile', outputfile)
 
 
 def tasks():
     return [
         count_alignment_errors,
+        summarize_error_profile,
     ]
 
