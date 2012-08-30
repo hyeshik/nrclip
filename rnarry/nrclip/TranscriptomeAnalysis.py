@@ -90,7 +90,7 @@ def resolve_transcriptomic_multihits_sam(inputfile, outputfile, sample, mismatch
 def resolve_transcriptomic_multihits_gmap(inputfile, outputfile, gmapple, mismatches):
     runproc("""
         $ZCAT $inputfile | \
-        $GMAP_MULTIHIT_RESOLVE $mismatches -tr | \
+        $GMAP_MULTIHIT_RESOLVE $mismatches -tr $FULLTAG_GMAP_MAXIMUM_INDEL | \
         $GZIP -c - > $outputfile""", outputfile)
 
 
