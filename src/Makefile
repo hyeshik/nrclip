@@ -8,14 +8,14 @@ CLIPSIM_LIBS=	-lm -lpthread -lz
 
 .PHONY:	all
 
-TARGETS=	clipsim-random-permutate SFMT.o
+TARGETS=	crossfest SFMT.o
 
 all: ${TARGETS}
-	#time ./clipsim-random-permutate simdata-CLIP-2J3.error simdata-CLIP-2J3.reads 20 simdata-CLIP-2J3-
+	#time ./crossfest simdata-CLIP-2J3.error simdata-CLIP-2J3.reads 20 simdata-CLIP-2J3-
 	python setup.py install --user
 	PYTHONPATH=build/lib.linux-x86_64-2.7/ python test.py
 
-clipsim-random-permutate: clipsim-random-permutate.c clipstatstree.c SFMT.o
+crossfest: crossfest.c clipstatstree.c SFMT.o
 	${CC} -o $@ ${CLIPSIM_CFLAGS} $+ ${CLIPSIM_LIBS}
 
 SFMT.o: ${SFMT_SUBDIR}/SFMT.c

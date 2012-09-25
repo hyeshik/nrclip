@@ -26,6 +26,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <getopt.h>
 #include <inttypes.h>
 #include <string.h>
 #include <assert.h>
@@ -144,7 +145,18 @@ typedef struct {
 void
 usage(const char *execpath)
 {
-    printf("Usage: %s {error profile}\n", execpath); /* TODO */
+    printf("CROSSFEST version 1.0 - crosslinking FDR estimator\n");
+    printf("Part of `nrclip' by Hyeshik Chang <hyeshik@snu.ac.kr>\n\n");
+    printf("This program implements a permutation-based approach described "
+           "in Zhang et al. (Nature Biotechnology, 2011, 29(7):607-14).\n\n");
+    printf("Usage: %s [OPTIONS]\n\n", execpath);
+    printf("Mapping and error profile files are prepared by "
+           "an external script.\n\n");
+    printf("  -m FILE\tmapping file (required)\n");
+    printf("  -e FILE\terror profile file (required)\n");
+    printf("  -o FILE\toutput file prefix (required)\n");
+    printf("  -t N\t\tnumber of worker threads (default: 8)\n");
+    printf("  -r N\t\tnumber of permutations (default: 1000)\n");
 }
 
 static void
@@ -699,25 +711,68 @@ main(int argc, char *argv[])
     const char *error_profile_path, *mapping_file_path, *output_prefix;
     ERROR_PROFILE *error_profile=NULL;
     JOB_COUNTER jobcounter;
-    int nthreads, i;
+    int nthreads, i, c;
+    int iterations;
 
-    if (argc < 5) {
+    error_profile_path = mapping_file_path = output_prefix = NULL;
+    nthreads = 8;
+    iterations = 1000;
+
+    while ((c = getopt(argc, argv, "e:m:o:t:r:h")) != -1)
+        switch (c) {
+        case 'e':
+            error_profile_path = optarg;
+            break;
+        case 'm':
+            mapping_file_path = optarg;
+            break;
+        case 't':
+            nthreads = atoi(optarg);
+            break;
+        case 'o':
+            output_prefix = optarg;
+            break;
+        case 'r':
+            iterations = atoi(optarg);
+            break;
+        default:
+            usage(argv[0]);
+            return 1;
+        }
+
+    if (error_profile_path == NULL) {
+        fprintf(stderr, "Error profile must be given.\n\n");
         usage(argv[0]);
-        return 0;
+        return 1;
     }
 
-    error_profile_path = argv[1];
-    mapping_file_path = argv[2];
-    nthreads = atoi(argv[3]);
-    if (nthreads < 1)
-        nthreads = 1;
-    output_prefix = argv[4];
+    if (mapping_file_path == NULL) {
+        fprintf(stderr, "Mapping file must be given.\n\n");
+        usage(argv[0]);
+        return 1;
+    }
+
+    if (nthreads < 0 || nthreads > 255) {
+        fprintf(stderr, "Number of threads invalid (%d).\n", nthreads);
+        return 1;
+    }
+
+    if (iterations < 1) {
+        fprintf(stderr, "Number of iterations invalid (%d).\n", iterations);
+        return 1;
+    }
+
+    if (output_prefix == NULL) {
+        fprintf(stderr, "Output files prefix must be given.\n\n");
+        usage(argv[0]);
+        return 1;
+    }
 
     error_profile = load_error_profile(error_profile_path);
     if (error_profile == NULL)
         goto onError;
 
-    jobcounter.total = 1000;
+    jobcounter.total = iterations;
     jobcounter.done = jobcounter.queued = 0;
     jobcounter.nthreads = nthreads;
     gettimeofday(&jobcounter.started, NULL);
