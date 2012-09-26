@@ -565,9 +565,6 @@ update_progression(WORKER *worker)
     }
     printf("]");
 
-//    printf("[thr#%d] Iteration #%d / %d is starting.",
-//           worker->threadid + 1, jc->queued + 1, jc->total);
-
     if (ran_threads >= 1) {
         double mean_job_time, eta_waiting_jobs, eta_running_jobs, eta;
         struct timeval tv;
@@ -605,7 +602,6 @@ update_progression(WORKER *worker)
         }
     }
 
-//    printf("\n");
     fflush(stdout);
 }
 
