@@ -36,9 +36,11 @@ GENOME = 'mm9'
 SPECIES = 'Mus musculus'
 SPECIES3 = 'mmu'
 CLIP_SAMPLES = ['CLIP-35L33G', 'CLIP-2J3', 'CLIP-46020']
-CLIPCTL_SAMPLES = ['PolyA-None-rep1']
-RPF_SAMPLES = ['RPF-Luc-rep1', 'RPF-Lin28a-rep1']
-RPFCTL_SAMPLES = ['PolyA-Luc-rep1', 'PolyA-Lin28a-rep1']
+CLIPCTL_SAMPLES = ['PolyA-None-rep1', 'PolyA-None-rep2', 'PolyA-None-rep3']
+RPF_SAMPLES = ['RPF-Luc-rep1', 'RPF-Luc-rep2', 'RPF-GFP-rep1',
+               'RPF-Lin28a-rep1', 'RPF-Lin28a-rep2', 'RPF-Lin28a-rep3']
+RPFCTL_SAMPLES = ['PolyA-Luc-rep1', 'PolyA-Luc-rep2', 'PolyA-GFP-rep1',
+                  'PolyA-Lin28a-rep1', 'PolyA-Lin28a-rep2', 'PolyA-Lin28a-rep3']
 ALL_SAMPLES = CLIP_SAMPLES + CLIPCTL_SAMPLES + RPF_SAMPLES + RPFCTL_SAMPLES
 SHORTTAG_SAMPLES = RPF_SAMPLES + RPFCTL_SAMPLES
 FULLTAG_SAMPLES = CLIP_SAMPLES + CLIPCTL_SAMPLES
@@ -47,15 +49,46 @@ ALLCLIP_SAMPLES = CLIP_SAMPLES + CLIPCTL_SAMPLES
 
 modban_illumina = 'CTGTAGGCACCATCAATTCGTATGCCGTCTTCTGCTTG'
 illumina_SRA15 = 'ATCTCGTATGCCGTCTTCTGCTTG'
+illumina_TruSeq = 'TGGAATTCTCGGGTGCCAAGGAACTCCAGTCAC'
 ADAPTER_SEQ = {
     'CLIP-35L33G': modban_illumina,
     'CLIP-2J3': modban_illumina,
     'CLIP-46020': modban_illumina,
     'PolyA-None-rep1': modban_illumina,
+    'PolyA-None-rep2': illumina_TruSeq,
+    'PolyA-None-rep3': illumina_TruSeq,
     'RPF-Luc-rep1': illumina_SRA15,
-    'RPF-Lin28a-rep1': illumina_SRA15,
+    'RPF-Luc-rep2': illumina_TruSeq,
+    'RPF-GFP-rep1': illumina_TruSeq,
+    'RPF-Lin28a-rep1': illumina_SRA15, # siLin28a-8
+    'RPF-Lin28a-rep2': illumina_TruSeq, # siLin28a-8
+    'RPF-Lin28a-rep3': illumina_TruSeq, # siLin28a-9
     'PolyA-Luc-rep1': illumina_SRA15,
-    'PolyA-Lin28a-rep1': illumina_SRA15,
+    'PolyA-Luc-rep2': illumina_TruSeq,
+    'PolyA-GFP-rep1': illumina_TruSeq,
+    'PolyA-Lin28a-rep1': illumina_SRA15, # siLin28a-8
+    'PolyA-Lin28a-rep2': illumina_TruSeq, # siLin28a-8
+    'PolyA-Lin28a-rep3': illumina_TruSeq, # siLin28a-9
+}
+QUALITY_SCALE = {
+    'CLIP-35L33G': 'illumina1.5',
+    'CLIP-2J3': 'illumina1.5',
+    'CLIP-46020': 'illumina1.5',
+    'PolyA-None-rep1': 'illumina1.5',
+    'PolyA-None-rep2': 'illumina1.8',
+    'PolyA-None-rep3': 'illumina1.8',
+    'RPF-Luc-rep1': 'illumina1.5',
+    'RPF-Luc-rep2': 'illumina1.8',
+    'RPF-GFP-rep1': 'illumina1.8',
+    'RPF-Lin28a-rep1': 'illumina1.5', # siLin28a-8
+    'RPF-Lin28a-rep2': 'illumina1.8', # siLin28a-8
+    'RPF-Lin28a-rep3': 'illumina1.8', # siLin28a-9
+    'PolyA-Luc-rep1': 'illumina1.5',
+    'PolyA-Luc-rep2': 'illumina1.8',
+    'PolyA-GFP-rep1': 'illumina1.8',
+    'PolyA-Lin28a-rep1': 'illumina1.5', # siLin28a-8
+    'PolyA-Lin28a-rep2': 'illumina1.8', # siLin28a-8
+    'PolyA-Lin28a-rep3': 'illumina1.8', # siLin28a-9
 }
 
 # fastx toolkit settings
