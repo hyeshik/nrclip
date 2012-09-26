@@ -32,7 +32,7 @@ def parse_refgene(annofile):
             'geneName': fields['name2'],
         }
 
-REFSEQ_CLSMAP = {'5': 'UTR5', '3': 'UTR5', 'i': 'intron', 'c': 'CDS'}
+REFSEQ_CLSMAP = {'5': 'UTR5', '3': 'UTR3', 'i': 'intron', 'c': 'CDS'}
 def load_refgene(bedout, refgene):
     def add(e, start, stop, ei, regtype):
         instancename = '%s.%d' % (e['name'], serial)
