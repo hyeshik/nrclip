@@ -29,6 +29,10 @@ from rnarry.nrclip import Paths, Options, TranscriptomeAnalysis
 from rnarry.nrclip.PipelineControl import *
 from rnarry.sequtils import get_first_sequence_length
 
+FASTQ_FORMAT = {
+    'illumina1.5': 'fastq-illumina',
+    'illumina1.8': 'fastq-sanger',
+}
 
 @files(for_each([Paths.fulltag_transcriptomic_besthits_gmap,
                  Paths.original_sequence_reads],
@@ -37,7 +41,8 @@ from rnarry.sequtils import get_first_sequence_length
 @follows(TranscriptomeAnalysis.resolve_transcriptomic_multihits_gmap)
 def count_alignment_errors(inputfiles, outputfile, sample):
     mapping, origseqs = inputfiles
-    readlength = get_first_sequence_length(origseqs)
+    format = FASTQ_FORMAT[Options.QUALITY_SCALE[sample]]
+    readlength = get_first_sequence_length(origseqs, format=format)
 
     runproc('$GMAP_ERROR_PROFILE $mapping $outputfile $readlength',
             outputfile)
