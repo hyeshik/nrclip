@@ -32,10 +32,11 @@ from rnarry.nrclip.PipelineControl import *
 
 
 @files(for_each([Paths.nr_refseq_db, Paths.tspace_read_database],
-                 Paths.cds_read_count_table]))
+                Paths.cds_read_count_table,
+                Options.SHORTTAG_SAMPLES))
 @follows(DataPreparation.build_nonredundant_refseq_database)
 @follows(TranscriptomeAnalysis.build_tspace_read_database)
-def count_cds_reads(inputfiles, outputfile):
+def count_cds_reads(inputfiles, outputfile, sample):
     nr_refseq_db, tspace = inputfiles
 
     runproc("""

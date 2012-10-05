@@ -29,11 +29,15 @@ from rnarry.nrclip import (
     Paths, Options, DerivedDatabaseBuilding, SequenceMasking)
 from rnarry.nrclip.PipelineControl import *
 
-
 @files(for_each([Paths.fulltag_masked_reads, Paths.reftranscriptome_gmap_index],
                 Paths.fulltag_transcriptome_alignment_sam,
                 Paths.FULLTAG_SAMPLES,
-                [Options.FULLTAG_TRANSCRIPTOME_MISMATCHES]))
+                [Options.FULLTAG_TRANSCRIPTOME_MISMATCHES]) +
+       for_each([Paths.shorttag_masked_reads,
+                 Paths.reftranscriptome_gmap_index],
+                Paths.shorttag_transcriptome_alignment_sam,
+                Paths.SHORTTAG_SAMPLES,
+                [Options.SHORTTAG_TRANSCRIPTOME_MISMATCHES]))
 @follows(DerivedDatabaseBuilding.generate_gsnap_transcriptome_index)
 @follows(SequenceMasking.produce_masked_fasta)
 @jobs_limit(1, 'exclusive')
@@ -67,7 +71,11 @@ def align_to_transcriptome_gmap(inputfiles, outputfile, sample, mismatches):
 @files(for_each(Paths.fulltag_transcriptome_alignment_sam,
                 Paths.fulltag_transcriptomic_besthits_sam,
                 Paths.FULLTAG_SAMPLES,
-                [Options.FULLTAG_POSTPROC_ALLOWED_MISMATCHES]))
+                [Options.FULLTAG_POSTPROC_ALLOWED_MISMATCHES]) +
+       for_each(Paths.shorttag_transcriptome_alignment_sam,
+                Paths.shorttag_transcriptomic_besthits_sam,
+                Paths.SHORTTAG_SAMPLES,
+                [Options.SHORTTAG_POSTPROC_ALLOWED_MISMATCHES]))
 @follows(align_to_transcriptome_sam)
 def resolve_transcriptomic_multihits_sam(inputfile, outputfile, sample, mismatches):
     runproc("""
@@ -96,7 +104,10 @@ def resolve_transcriptomic_multihits_gmap(inputfile, outputfile, gmapple, mismat
 
 @files(for_each(Paths.fulltag_transcriptomic_besthits_sam,
                 Paths.tspace_read_database,
-                Paths.FULLTAG_SAMPLES))
+                Paths.FULLTAG_SAMPLES) +
+       for_each(Paths.shorttag_transcriptomic_besthits_sam,
+                Paths.tspace_read_database,
+                Paths.SHORTTAG_SAMPLES))
 @follows(resolve_transcriptomic_multihits_sam)
 def build_tspace_read_database(inputfile, outputfile, sample):
     runproc("""

@@ -62,9 +62,26 @@ def summarize_annotations(inputfiles, outputfile, sample):
         """, outputfile)
 
 
+#@files(for_each(Paths.shorttag_annotation,
+#                Paths.shorttag_mRNA_reads_count,
+#                Paths.SHORTTAG_SAMPLES))
+#@follows(summarize_annotations)
+#def count_mRNA_reads(inputfile, outputfile, sample):
+#    runproc("""
+#        $ZCAT $inputfile |
+#        $AWK -F'\t' 'BEGIN {cnt=0}
+#            { if ($$3 == "CDS" || $$3 == "UTR5" || $$3 == "UTR3") {
+#                split($$1, tok, "-");
+#                cnt += tok[2];
+#              }
+#            } END { print cnt }' > $outputfile
+#        """, outputfile)
+
+
 def tasks():
     return [
         annotate_sequences,
         summarize_annotations,
+#        count_mRNA_reads,
     ]
 

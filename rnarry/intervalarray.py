@@ -1,4 +1,5 @@
-# Copyright (c) 2011 Seoul National University RNA Biology Laboratory.
+#
+# Copyright (c) 2012 Hyeshik Chang
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,93 +19,37 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 #
-# - Hyeshik Chang <hyeshik@snu.ac.kr>
-#
 
 __all__ = [
-    'iterseq_sequential',
-    'GiantFASTAFile',
-    'reverse_complement',
-    'iter_windowed',
-    'iter_windowed_str',
-    'get_first_sequence_length',
+    'TranscriptLevelReadsStats',
 ]
 
-from Bio import SeqIO
-import string
-import gzip
-from collections import deque
-import os
-import re
+from rnarry.utils import LRU, lru_cached
+import lzo as comp
+import numpy as np
+import bsddb
 
-def iterseq_sequential(fastapath):
-    nextid = yield
-    for seq in SeqIO.parse(open(fastapath, 'r'), format='fasta'):
-        while seq.name == nextid:
-            nextid = yield seq
+class TranscriptLevelReadsStats(object):
 
-import pysam
-# provides an interface like 'samtools faidx'.
-whitespace = re.compile('[ \t\r\n]')
-class GiantFASTAFile(object):
+    NROW = 9
+    ROWSPACE = ['depth', '5', '3', 'A', 'C', 'G', 'T', 'I', 'D', 'N']
+    ROWSPACE2i = dict((tp, i) for i, tp in enumerate(ROWSPACE))
 
-    def __init__(self, filename):
-        if not os.path.exists(filename + '.fai'):
-            pysam.faidx(filename)
+    def __init__(self, filepath, cachedepth=10):
+        self.cache = LRU(cachedepth)
+        self.db = bsddb.hashopen(filepath, 'r')
+        self._get = lru_cached(self._get, self.cache)
 
-        self.fasta = open(filename)
-        self.index = self.load_index(filename + '.fai')
+    def _get(self, acc):
+        flat = np.fromstring(comp.decompress(self.db[acc]), 'I')
+        return flat.reshape([self.NROW, len(flat) // self.NROW])
 
-    def load_index(self, filename):
-        index = {}
-        for line in open(filename):
-            fields = line[:-1].split('\t')
-            index[fields[0]] = tuple(map(int, fields[1:]))
-        return index
-
-    def get(self, seqid, start=None, stop=None): # zero-based, half-open
-        length, filepos, colwidth, linesize = self.index[seqid]
-
-        if start is None and stop is None:
-            offset_st = filepos
-            linenum_en = length // colwidth
-            offset_en = filepos + length + linenum_en * (linesize - colwidth)
+    def get(self, acc, which=None):
+        if which is None:
+            return self._get(acc)
         else:
-            linenum_st = start // colwidth
-            offset_st = filepos + start + linenum_st * (linesize - colwidth)
-            linenum_en = stop // colwidth
-            offset_en = filepos + stop + linenum_en * (linesize - colwidth)
+            return self._get(acc)[self.ROWSPACE2i[which]]
 
-        self.fasta.seek(offset_st, 0)
-        return whitespace.sub('', self.fasta.read(offset_en - offset_st))
-
-
-revcmptrans = string.maketrans('ATUGCatugc', 'TAACGtaacg')
-def reverse_complement(seq):
-    return seq.translate(revcmptrans)[::-1]
-
-def iter_windowed(it, width):
-    i = iter(it)
-
-    queue = deque()
-    for _ in range(width):
-        queue.append(i.next())
-
-    yield tuple(queue)
-
-    for next in i:
-        queue.popleft()
-        queue.append(next)
-        yield tuple(queue)
-
-def iter_windowed_str(it, width):
-    for r in iter_windowed(it, width):
-        yield ''.join(r)
-
-def get_first_sequence_length(path, format='fastq-illumina', gzipped=True):
-    if gzipped:
-        opener = gzip.open
-    else:
-        opener = open
-    return len(SeqIO.parse(opener(path), format=format).next().seq)
+    def keys(self):
+        return self.db.keys()
 

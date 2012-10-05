@@ -99,6 +99,7 @@ STATS_READ_CLASS_PROPORTION = PYTHON + ' scripts/stats-read-class-proportion.py'
 STATS_READ_CLASS_ADD_FILTERED = 'sh scripts/stats-classstat-addprealns.sh'
 GMAP_ERROR_PROFILE = PYTHON + ' scripts/gmap-error-profile.py'
 SUMMARIZE_ERROR_PROFILE = PYTHON + ' scripts/summarize-error-profile.py'
+TSPACE_COUNT_CDS = PYTHON + ' scripts/tspace-count-cds.py'
 
 
 # =================================
@@ -220,6 +221,7 @@ shorttag_primary_annotation = relfmt(ANNOTATIONS_DIR + '/short-%s.bedintersect.g
 shorttag_annotation = relfmt(ANNOTATIONS_DIR + '/short-%s.anno.gz')
 shorttag_masked_readids = relfmt(ANNOTATIONS_DIR + '/short-%s.masked_ids')
 shorttag_masked_reads = relfmt(SEQUENCES_DIR + '/short-%s-masked.fa')
+#shorttag_mRNA_reads_count = relfmt(ANNOTATIONS_DIR + '/short-%s.mrna_reads')
 
 
 # =================
@@ -241,6 +243,8 @@ reftranscriptome_dbname = 'reftranscriptome'
 
 fulltag_transcriptome_alignment_sam = relfmt(TRANSCRIPTOMEALN_DIR + '/full-%s.sam.gz')
 fulltag_transcriptomic_besthits_sam = relfmt(TRANSCRIPTOMEALN_DIR + '/full-%s-besthits.sam.gz')
+shorttag_transcriptome_alignment_sam = relfmt(TRANSCRIPTOMEALN_DIR + '/short-%s.sam.gz')
+shorttag_transcriptomic_besthits_sam = relfmt(TRANSCRIPTOMEALN_DIR + '/short-%s-besthits.sam.gz')
 fulltag_transcriptome_alignment_gmap = relfmt(TRANSCRIPTOMEALN_DIR + '/full-%s.gmap.gz')
 fulltag_transcriptomic_besthits_gmap = relfmt(TRANSCRIPTOMEALN_DIR + '/full-%s-besthits.gmap.gz')
 tspace_read_database = relfmt(TRANSCRIPTOMEALN_DIR + '/%s.tspace')
@@ -258,4 +262,10 @@ error_profile_summarized = relfmt(ERRORANALYSIS_DIR + '/%s-error_profile.pickle'
 
 clip_enrichment_summary = rel(STATISTICS_DIR + '/clip-refseq-enrichment.csv')
 total_read_class_stats = relfmt(STATISTICS_DIR + '/classprop.%s.csv')
+
+
+# ==================
+# Ribosome Profiling
+
+cds_read_count_table = relfmt(STATISTICS_DIR + '/cdsreads.%s.txt')
 
