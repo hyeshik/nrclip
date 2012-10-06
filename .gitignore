@@ -1,5 +1,6 @@
 *.swp
 *.pyc
+*.fai
 external/all-annotations.bed.gz
 external/downloaded/*
 external/early-filter/*
@@ -29,9 +30,15 @@ sequences/*-total.fa
 sequences/*-tags.fa
 sequences/full-*
 sequences/short-*
+src/*.o
+src/build
+src/crossfest
 annotations/*
 derived/*
 prealns/*
 tmp/*
 genomealn/*
 flowchart.*
+stats
+transcriptomealn
+erroranalysis
