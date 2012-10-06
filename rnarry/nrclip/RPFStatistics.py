@@ -43,7 +43,22 @@ def count_cds_reads(inputfiles, outputfile, sample):
         $TSPACE_COUNT_CDS $nr_refseq_db $tspace > $outputfile""", outputfile)
 
 
+@files([Paths.cds_read_count_table(s) for s in Options.SHORTTAG_SAMPLES],
+       Paths.rpf_summarized_table)
+@follows(count_cds_reads)
+def summarize_rpf_counts(inputfiles, outputfile):
+    filemapping = ' '.join('%s:%s' % (s, Paths.cds_read_count_table(s))
+                           for s in Options.SHORTTAG_SAMPLES)
+    pairs = ' '.join('%s:%s:%s' % (grpname, rpf, polya)
+                     for grpname, (rpf, polya) in Options.RPF_PAIRS)
+
+    runproc("""
+        $SUMMARIZE_RPF_COUNTS "$filemapping" "$pairs" > $outputfile""",
+        outputfile)
+
+
 def tasks():
     return [
         count_cds_reads,
+        summarize_rpf_counts,
     ]

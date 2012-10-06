@@ -100,6 +100,7 @@ STATS_READ_CLASS_ADD_FILTERED = 'sh scripts/stats-classstat-addprealns.sh'
 GMAP_ERROR_PROFILE = PYTHON + ' scripts/gmap-error-profile.py'
 SUMMARIZE_ERROR_PROFILE = PYTHON + ' scripts/summarize-error-profile.py'
 TSPACE_COUNT_CDS = PYTHON + ' scripts/tspace-count-cds.py'
+SUMMARIZE_RPF_COUNTS = PYTHON + ' scripts/summarize-rpf-counts.py'
 
 
 # =================================
@@ -268,4 +269,5 @@ total_read_class_stats = relfmt(STATISTICS_DIR + '/classprop.%s.csv')
 # Ribosome Profiling
 
 cds_read_count_table = relfmt(STATISTICS_DIR + '/cdsreads.%s.txt')
+rpf_summarized_table = rel(STATISTICS_DIR + '/cdsreads-summarized.txt')
 

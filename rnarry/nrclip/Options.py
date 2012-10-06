@@ -46,6 +46,14 @@ SHORTTAG_SAMPLES = RPF_SAMPLES + RPFCTL_SAMPLES
 FULLTAG_SAMPLES = CLIP_SAMPLES + CLIPCTL_SAMPLES
 SNPREF_SAMPLE = CLIPCTL_SAMPLES[0]
 ALLCLIP_SAMPLES = CLIP_SAMPLES + CLIPCTL_SAMPLES
+RPF_PAIRS = [
+    ('Luc-r1', ('RPF-Luc-rep1', 'PolyA-Luc-rep1')),
+    ('Luc-r2', ('RPF-Luc-rep2', 'PolyA-Luc-rep2')),
+    ('GFP-r1', ('RPF-GFP-rep1', 'PolyA-GFP-rep1')),
+    ('Lin28a-r1', ('RPF-Lin28a-rep1', 'PolyA-Lin28a-rep1')),
+    ('Lin28a-r2', ('RPF-Lin28a-rep2', 'PolyA-Lin28a-rep2')),
+    ('Lin28a-r3', ('RPF-Lin28a-rep3', 'PolyA-Lin28a-rep3')),
+]
 
 modban_illumina = 'CTGTAGGCACCATCAATTCGTATGCCGTCTTCTGCTTG'
 illumina_SRA15 = 'ATCTCGTATGCCGTCTTCTGCTTG'
