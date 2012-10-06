@@ -28,13 +28,15 @@ def process(readcounts, samplepairs):
     def normalized_count(label, accession):
         return ((readcounts[label].get(accession, 0) + 1) * NORMBASE /
                 readcounts[label][TOTALREADS])
+        #return readcounts[label].get(accession, 0)
 
-    for acc in sorted(alltranscripts - set(TOTALREADS)):
+    for acc in sorted(alltranscripts - set([TOTALREADS])):
         fields = [acc]
         for sample, polya_label, rpf_label in samplepairs:
             polya_value = normalized_count(polya_label, acc)
             rpf_value = normalized_count(rpf_label, acc)
             fields.extend([polya_value, rpf_value, rpf_value / polya_value])
+            #fields.extend([polya_value, rpf_value, (rpf_value+1) / (polya_value+1)])
         w.writerow(fields)
 
 

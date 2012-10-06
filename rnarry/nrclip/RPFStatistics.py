@@ -49,7 +49,7 @@ def count_cds_reads(inputfiles, outputfile, sample):
 def summarize_rpf_counts(inputfiles, outputfile):
     filemapping = ' '.join('%s:%s' % (s, Paths.cds_read_count_table(s))
                            for s in Options.SHORTTAG_SAMPLES)
-    pairs = ' '.join('%s:%s:%s' % (grpname, rpf, polya)
+    pairs = ' '.join('%s:%s:%s' % (grpname, polya, rpf)
                      for grpname, (rpf, polya) in Options.RPF_PAIRS)
 
     runproc("""
