@@ -710,6 +710,64 @@ write_permutation_result(const char *prefix, const char *method,
     return 0;
 }
 
+#ifdef __gnu_linux__
+static uint64_t
+get_total_memory_size(void)
+{
+    FILE *fp;
+    char label[BUFSIZ], memunit[BUFSIZ];
+    uint64_t amount;
+
+    fp = fopen("/proc/meminfo", "r");
+    if (fp == NULL)
+        return 0;
+
+    if (fscanf(fp, "%s %lu %s", label, &amount, memunit) < 3) {
+        fclose(fp);
+        return 0;
+    }
+    fclose(fp);
+
+    if (strcmp(label, "MemTotal:") != 0 || strcmp(memunit, "kB") != 0) {
+        fprintf(stderr, "Unexpected first line\n");
+        return 0;
+    }
+
+    return amount * 1024;
+}
+#endif
+
+static void
+adjust_threads_for_memory(ERROR_PROFILE *prof, int *nthreads)
+{
+#ifdef __gnu_linux__
+    uint64_t totalbases;
+    uint32_t pos, base1, base2;
+    int recommended_threads;
+
+    totalbases = 0;
+    for (pos = 0; pos < prof->readlength; pos++)
+        for (base1 = 0; base1 < NUMBASES; base1++)
+            for (base2 = 0; base2 < NUMBASES; base2++)
+                totalbases += prof->readdist[pos][base1][base2];
+
+    recommended_threads = (int)(get_total_memory_size() / 1.5 / totalbases);
+    if (recommended_threads < 1) {
+        printf("Memory is desperately insufficient for this data set. "
+               "The program proceeds to run, however it will extremely slow "
+               "due to excessive swapping.\n");
+        *nthreads = 1;
+    }
+    else if (recommended_threads < *nthreads) {
+        printf("Due to memory insufficiency, number of threads is adjusted "
+               "from %d to %d.\n", *nthreads, recommended_threads);
+        *nthreads = recommended_threads;
+    }
+#else
+    return;
+#endif
+}
+
 int
 main(int argc, char *argv[])
 {
@@ -768,6 +826,8 @@ main(int argc, char *argv[])
     error_profile = load_error_profile(input_path, &errorprofile_blk_size);
     if (error_profile == NULL)
         goto onError;
+
+    adjust_threads_for_memory(error_profile, &nthreads);
 
     jobcounter.total = iterations;
     jobcounter.done = jobcounter.queued = 0;
@@ -892,6 +952,7 @@ main(int argc, char *argv[])
             double elapsed_time;
             struct timeval tv;
 
+            gettimeofday(&tv, NULL);
             elapsed_time = TIMEVAL_DIFF(jobcounter.started, tv);
             printf("\n\n%d iterations successfully finished. "
                    "(%.2lf itr/hr)\n",

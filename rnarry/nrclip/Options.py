@@ -29,8 +29,7 @@
 # Project-specific configurations
 
 NUM_PARALLEL = 8
-NUM_THREADS = 18
-#NUM_THREADS = 8
+NUM_THREADS = 24
 MAX_PARALLEL_DOWNLOADING = 4
 
 GENOME = 'mm9'
