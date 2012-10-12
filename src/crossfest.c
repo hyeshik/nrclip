@@ -117,7 +117,8 @@ typedef struct _worker {
     struct _worker *workers;
     pthread_t thread;
     ERROR_PROFILE *error_profile;
-    const char *mapping_file_path;
+    const char *input_path;
+    size_t errorprofile_blk_size;
     JOB_COUNTER *jobcounter;
     int threadid;
     double last_consumed;
@@ -152,8 +153,7 @@ usage(const char *execpath)
     printf("Usage: %s [OPTIONS]\n\n", execpath);
     printf("Mapping and error profile files are prepared by "
            "an external script.\n\n");
-    printf("  -m FILE\tmapping file (required)\n");
-    printf("  -e FILE\terror profile file (required)\n");
+    printf("  -i FILE\tinput data pack file (required)\n");
     printf("  -o FILE\toutput file prefix (required)\n");
     printf("  -t N\t\tnumber of worker threads (default: 8)\n");
     printf("  -r N\t\tnumber of permutations (default: 1000)\n");
@@ -180,7 +180,7 @@ randgen_rand(RANDGEN_STATE *rstate, uint64_t maximum)
 }
 
 static ERROR_PROFILE *
-load_error_profile(const char *filepath)
+load_error_profile(const char *filepath, size_t *profileblksize)
 {
     FILE *fp=NULL;
     ERROR_PROFILE_HEADER filehead;
@@ -223,6 +223,11 @@ load_error_profile(const char *filepath)
     printf("Loaded error profile for %d cycles.\n", filehead.readlength);
 
     fclose(fp);
+
+    /* Set total size of the error profile block to make it easier to
+     * skip the block when we're reading alignment blocks */
+    *profileblksize = sizeof(filehead) + recsize * numrecords;
+
     return profile;
 
   onError:
@@ -303,7 +308,7 @@ generate_read_queue_set(RANDGEN_STATE *rgen, ERROR_PROFILE *error_profile)
 {
     READ_QUEUE_SET *queueset;
     size_t numqueues;
-    uint32_t pos, refbase;
+    uint32_t pos, refbase, run_readlength;
     const uint64_t dummy_readdist[NUMBASES]={0, 0, 0, 0, 0};
 
     numqueues = (error_profile->readlength + READ_QUEUE_UNIFORM_EXTENSION)
@@ -315,9 +320,9 @@ generate_read_queue_set(RANDGEN_STATE *rgen, ERROR_PROFILE *error_profile)
     }
 
     memset(queueset, 0, sizeof(READ_QUEUE) * numqueues);
-    queueset->readlength = error_profile->readlength;
+    run_readlength = error_profile->readlength;
 
-    for (pos = 0; pos < queueset->readlength; pos++) {
+    for (pos = 0; pos < run_readlength; pos++) {
         for (refbase = 0; refbase < NUMBASES; refbase++) {
             if (generate_shuffled_read_queue(rgen,
                     &queueset->queues[pos][refbase],
@@ -332,16 +337,16 @@ generate_read_queue_set(RANDGEN_STATE *rgen, ERROR_PROFILE *error_profile)
     for (pos = 0; pos < READ_QUEUE_UNIFORM_EXTENSION; pos++) {
         for (refbase = 0; refbase < NUMBASES; refbase++) {
             if (generate_shuffled_read_queue(rgen,
-                    &queueset->queues[pos + queueset->readlength][refbase],
+                    &queueset->queues[pos + run_readlength][refbase],
                     dummy_readdist, refbase) != 0) {
                 fprintf(stderr, "Error on padding extended read queue\n");
                 goto onError;
             }
         }
     }
+    queueset->readlength = run_readlength + READ_QUEUE_UNIFORM_EXTENSION;
 
     return queueset;
-
 
   onError:
     free_read_queue_set(queueset);
@@ -399,10 +404,9 @@ shannon_entropy(const uint32_t *counts)
 }
 
 static int
-simulate_sequencing(const char *mapping_file_path, READ_QUEUE_SET *queueset,
-                    CLIPSTATS_TREES *trees)
+simulate_sequencing(FILE *inputf,
+                    READ_QUEUE_SET *queueset, CLIPSTATS_TREES *trees)
 {
-    FILE *fp=NULL;
     MAPPING_HEADER header;
     unsigned char *refseq=NULL;
     uint32_t *posreadcount=NULL;
@@ -419,18 +423,12 @@ simulate_sequencing(const char *mapping_file_path, READ_QUEUE_SET *queueset,
         goto onError;
     }
 
-    fp = fopen(mapping_file_path, "r"); 
-    if (fp == NULL) {
-        fprintf(stderr, "Failed to open mapping file %s\n", mapping_file_path);
-        goto onError;
-    }
-
     for (;;) {
         int r;
         uint32_t i;
         uint32_t *cntptr;
 
-        r = fread(&header, sizeof(header), 1, fp);
+        r = fread(&header, sizeof(header), 1, inputf);
         if (r == -1) {
             fprintf(stderr, "Error occurred while reading mapping file.\n");
             goto onError;
@@ -443,7 +441,7 @@ simulate_sequencing(const char *mapping_file_path, READ_QUEUE_SET *queueset,
             goto onError;
         }
 
-        if (fread(refseq, header.seqlength, 1, fp) < 1) {
+        if (fread(refseq, header.seqlength, 1, inputf) < 1) {
             fprintf(stderr, "Failed to load sequence `%s'\n", header.name);
             goto onError;
         }
@@ -458,7 +456,7 @@ simulate_sequencing(const char *mapping_file_path, READ_QUEUE_SET *queueset,
             uint32_t n, maplength;
             int j, k;
 
-            if (fread(&mapping, sizeof(mapping), 1, fp) < 1) {
+            if (fread(&mapping, sizeof(mapping), 1, inputf) < 1) {
                 fprintf(stderr, "Failed to load mapping `%s'\n", header.name);
                 goto onError;
             }
@@ -471,7 +469,8 @@ simulate_sequencing(const char *mapping_file_path, READ_QUEUE_SET *queueset,
 
             for (n = 0; n < mapping.nreads; n++) {
                 /* Simulate a read iteration */
-                for (j = k = 0; j < maplength; j++, k++) {
+                for (j = k = 0; j < maplength && k < queueset->readlength;
+                     j++, k++) {
                     /* j for refseq position, k for read position */
                     int readgen, refbase=refseq[j + mapping.start];
                     READ_QUEUE *queue;
@@ -526,13 +525,10 @@ simulate_sequencing(const char *mapping_file_path, READ_QUEUE_SET *queueset,
 
     free(posreadcount);
     free(refseq);
-    fclose(fp);
 
     return 0;
 
   onError:
-    if (fp != NULL)
-        fclose(fp);
     if (refseq != NULL)
         free(refseq);
     if (posreadcount != NULL)
@@ -612,10 +608,18 @@ run_clip_permutation(void *args)
     JOB_COUNTER *jobcounter;
     RANDGEN_STATE randgen;
     WORKER *worker;
+    FILE *fp=NULL;
 
     randgen_init(&randgen);
     worker = (WORKER *)args;
     jobcounter = worker->jobcounter;
+
+    fp = fopen(worker->input_path, "r"); 
+    if (fp == NULL) {
+        fprintf(stderr, "Failed to open input file %s\n", worker->input_path);
+        return NULL;
+    }
+
     trees = clipstatstrees_new();
 
 #define BEGIN_JOBCOUNTER_EXCLUSIVE  pthread_mutex_lock(&jobcounter->lock);
@@ -652,12 +656,15 @@ run_clip_permutation(void *args)
                                                  worker->error_profile);
         if (read_queue_set == NULL) {
             LOCK_AND_UPDATE_STATUS(worker, WORKER_STATUS_ERROR);
+            fclose(fp);
             return NULL;
         }
 
         /* Run simulated sequencing and get profiles */
         LOCK_AND_UPDATE_STATUS(worker, WORKER_STATUS_SIMULATING);
-        simulate_sequencing(worker->mapping_file_path, read_queue_set, trees);
+
+        fseek(fp, worker->errorprofile_blk_size, SEEK_SET);
+        simulate_sequencing(fp, read_queue_set, trees);
 
         free_read_queue_set(read_queue_set);
 
@@ -673,6 +680,8 @@ run_clip_permutation(void *args)
 
         END_JOBCOUNTER_EXCLUSIVE
     }
+
+    fclose(fp);
 
     return (void *)trees;
 }
@@ -704,23 +713,21 @@ write_permutation_result(const char *prefix, const char *method,
 int
 main(int argc, char *argv[])
 {
-    const char *error_profile_path, *mapping_file_path, *output_prefix;
+    const char *input_path, *output_prefix;
     ERROR_PROFILE *error_profile=NULL;
     JOB_COUNTER jobcounter;
     int nthreads, i, c;
     int iterations;
+    size_t errorprofile_blk_size=0;
 
-    error_profile_path = mapping_file_path = output_prefix = NULL;
+    input_path = output_prefix = NULL;
     nthreads = 8;
     iterations = 1000;
 
-    while ((c = getopt(argc, argv, "e:m:o:t:r:h")) != -1)
+    while ((c = getopt(argc, argv, "i:m:o:t:r:h")) != -1)
         switch (c) {
-        case 'e':
-            error_profile_path = optarg;
-            break;
-        case 'm':
-            mapping_file_path = optarg;
+        case 'i':
+            input_path = optarg;
             break;
         case 't':
             nthreads = atoi(optarg);
@@ -736,14 +743,8 @@ main(int argc, char *argv[])
             return 1;
         }
 
-    if (error_profile_path == NULL) {
-        fprintf(stderr, "Error profile must be given.\n\n");
-        usage(argv[0]);
-        return 1;
-    }
-
-    if (mapping_file_path == NULL) {
-        fprintf(stderr, "Mapping file must be given.\n\n");
+    if (input_path == NULL) {
+        fprintf(stderr, "Input data pack must be given.\n\n");
         usage(argv[0]);
         return 1;
     }
@@ -764,7 +765,7 @@ main(int argc, char *argv[])
         return 1;
     }
 
-    error_profile = load_error_profile(error_profile_path);
+    error_profile = load_error_profile(input_path, &errorprofile_blk_size);
     if (error_profile == NULL)
         goto onError;
 
@@ -801,7 +802,8 @@ main(int argc, char *argv[])
         for (i = 0; i < nthreads; i++) {
             workers[i].workers = workers;
             workers[i].error_profile = error_profile;
-            workers[i].mapping_file_path = mapping_file_path;
+            workers[i].input_path = input_path;
+            workers[i].errorprofile_blk_size = errorprofile_blk_size;
             workers[i].jobcounter = &jobcounter;
             workers[i].threadid = i;
             workers[i].last_consumed = -1;
