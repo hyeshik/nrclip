@@ -29,7 +29,8 @@
 # Project-specific configurations
 
 NUM_PARALLEL = 8
-NUM_THREADS = 24
+NUM_THREADS = 18
+#NUM_THREADS = 8
 MAX_PARALLEL_DOWNLOADING = 4
 
 GENOME = 'mm9'
@@ -130,4 +131,7 @@ REPEATMASKER_IGNORE_CLASSES = 'tRNA snRNA scRNA srpRNA'.split()
 
 # Expression quantification settings
 GSPACE_STATS_MINIMUM_RAW_READS = 10
+
+# CLIP options
+CROSSFEST_PERMUTATIONS = 1000
 

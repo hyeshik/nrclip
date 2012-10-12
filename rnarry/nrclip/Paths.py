@@ -101,6 +101,8 @@ GMAP_ERROR_PROFILE = PYTHON + ' scripts/gmap-error-profile.py'
 SUMMARIZE_ERROR_PROFILE = PYTHON + ' scripts/summarize-error-profile.py'
 TSPACE_COUNT_CDS = PYTHON + ' scripts/tspace-count-cds.py'
 SUMMARIZE_RPF_COUNTS = PYTHON + ' scripts/summarize-rpf-counts.py'
+CLIPSIM_PREPARE_INPUTS = PYTHON + ' scripts/clipsim-prepare-inputs.py'
+CROSSFEST = 'src/crossfest'
 
 
 # =================================
@@ -270,4 +272,12 @@ total_read_class_stats = relfmt(STATISTICS_DIR + '/classprop.%s.csv')
 
 cds_read_count_table = relfmt(STATISTICS_DIR + '/cdsreads.%s.txt')
 rpf_summarized_table = rel(STATISTICS_DIR + '/cdsreads-summarized.txt')
+
+
+# ====
+# CLIP
+
+clipsim_input_data_pack = relfmt(ERRORANALYSIS_DIR + '/%s-sim.pack')
+clipsim_output_prefix = relfmt(ERRORANALYSIS_DIR + '/%s-permutations-')
+clipsim_output_entropy = relfmt(ERRORANALYSIS_DIR + '/%s-permutations-entropy.simout.gz')
 

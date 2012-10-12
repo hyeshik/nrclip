@@ -56,9 +56,33 @@ def summarize_error_profile(inputfile, outputfile, sample):
     runproc('$SUMMARIZE_ERROR_PROFILE $inputfile $outputfile', outputfile)
 
 
+@files(for_each([Paths.reftranscriptome_sequences,
+                 Paths.fulltag_transcriptomic_besthits_gmap,
+                 Paths.error_profile_read_level],
+                Paths.clipsim_input_data_pack,
+                Paths.ALLCLIP_SAMPLES))
+@follows(TranscriptomeAnalysis.resolve_transcriptomic_multihits_gmap)
+@follows(count_alignment_errors)
+def prepare_clip_sim_input(inputfiles, outputfile, sample):
+    inputs = ' '.join(inputfiles)
+    runproc('$CLIPSIM_PREPARE_INPUTS $inputs $outputfile', outputfile)
+
+
+@files(for_each(Paths.clipsim_input_data_pack, Paths.clipsim_output_entropy,
+                Paths.ALLCLIP_SAMPLES))
+@follows(prepare_clip_sim_input)
+@jobs_limit(1, 'exclusive')
+def permutate_clip_alignments(inputfile, outputfile, sample):
+    outputprefix = Paths.clipsim_output_prefix(sample)
+    runproc('$CROSSFEST -i $inputfile -o $outputprefix -t $NUM_THREADS '
+            '-r $CROSSFEST_PERMUTATIONS', outputfile)
+
+
 def tasks():
     return [
         count_alignment_errors,
         summarize_error_profile,
+        prepare_clip_sim_input,
+        permutate_clip_alignments,
     ]
 
