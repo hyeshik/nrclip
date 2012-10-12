@@ -741,7 +741,7 @@ static void
 adjust_threads_for_memory(ERROR_PROFILE *prof, int *nthreads)
 {
 #ifdef __gnu_linux__
-    uint64_t totalbases;
+    uint64_t totalbases, memsize;
     uint32_t pos, base1, base2;
     int recommended_threads;
 
@@ -751,7 +751,13 @@ adjust_threads_for_memory(ERROR_PROFILE *prof, int *nthreads)
             for (base2 = 0; base2 < NUMBASES; base2++)
                 totalbases += prof->readdist[pos][base1][base2];
 
-    recommended_threads = (int)(get_total_memory_size() / 1.5 / totalbases);
+    memsize = get_total_memory_size();
+    if (memsize == 0) {
+        printf("Failed to get the total size of memory in /proc/meminfo\n");
+        return;
+    }
+
+    recommended_threads = (int)(memsize / 1.5 / totalbases);
     if (recommended_threads < 1) {
         printf("Memory is desperately insufficient for this data set. "
                "The program proceeds to run, however it will extremely slow "
