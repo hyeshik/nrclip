@@ -888,7 +888,15 @@ main(int argc, char *argv[])
 
         free(workers);
 
-        printf("\n\nfinished.\n");
+        {
+            double elapsed_time;
+            struct timeval tv;
+
+            elapsed_time = TIMEVAL_DIFF(jobcounter.started, tv);
+            printf("\n\n%d iterations successfully finished. "
+                   "(%.2lf itr/hr)\n",
+                   iterations, 3600. / elapsed_time * iterations);
+        }
     }
 
     free(error_profile);
