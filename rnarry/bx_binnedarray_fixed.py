@@ -1,4 +1,61 @@
 """
+This is a slightly-modified version of James Taylor's bx.binned_array.
+It might have a minor problem on caching in get_ranges operation in
+FileBinnedArray. I'm not sure if it's a bug, anyway nrclip uses this
+modified version.
+
+Change:
+--- binned_array.py	2012-10-13 11:46:56.937341573 +0900
++++ bx_binnedarray_fixed.py	2012-07-26 16:37:15.318928190 +0900
+@@ -213,24 +213,27 @@
+         while size > 0:
+             bin, offset = self.get_bin_offset( start )
+             delta = self.bin_size - offset
+-            if not bin in self.bins and self.bin_pos[bin] != 0:
+-                self.load_bin( bin )
+-            if self.bins[bin] is None:
+-                if delta < size:
++            if bin not in self.bins:
++                if self.bin_sizes[bin] != 0:
++                    self.load_bin( bin )
++                elif delta < size:
+                     rval.append( resize( array(self.default, self.typecode), (delta,) ) )
+                     size -= delta
+                     start += delta
++                    continue
+                 else:
+                     rval.append( resize( array(self.default, self.typecode), (size,) ) )
+                     size = 0
++                    continue
++
++            if delta < size:
++                rval.append( self.bins[bin][offset:offset+delta] )
++                size -= delta
++                start += delta
+             else:
+-                if delta < size:
+-                    rval.append( self.bins[bin][offset:offset+delta] )
+-                    size -= delta
+-                    start += delta
+-                else:
+-                    rval.append( self.bins[bin][offset:offset+size] )
+-                    size = 0
++                rval.append( self.bins[bin][offset:offset+size] )
++                size = 0
++
+         return concatenate( rval )
+     def __getitem__( self, key ):
+         if isinstance( key, slice ):
+@@ -342,4 +345,4 @@
+ def read_packed( f, pattern ):
+     rval = unpack( pattern, f.read( calcsize( pattern ) ) )
+     if len( rval ) == 1: return rval[0]
+-    return rval
+\ No newline at end of file
++    return rval
+"""
+
+"""
 Numeric arrays stored as individually compressed blocks on disk, allowing
 pseudo-random acccess. 
 

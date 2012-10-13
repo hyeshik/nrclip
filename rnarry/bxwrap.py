@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Copyright (c) 2011 Seoul National University RNA Biology Laboratory.
+# Copyright (c) 2011-2012 Hyeshik Chang
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
