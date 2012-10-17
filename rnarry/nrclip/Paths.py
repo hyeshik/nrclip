@@ -103,6 +103,7 @@ TSPACE_COUNT_CDS = PYTHON + ' scripts/tspace-count-cds.py'
 SUMMARIZE_RPF_COUNTS = PYTHON + ' scripts/summarize-rpf-counts.py'
 CLIPSIM_PREPARE_INPUTS = PYTHON + ' scripts/clipsim-prepare-inputs.py'
 CROSSFEST = 'src/crossfest'
+CLIPSIM_REALDATA_DISTS = PYTHON = ' scripts/clipsim-realdata-dist.py'
 
 
 # =================================
@@ -280,4 +281,10 @@ rpf_summarized_table = rel(STATISTICS_DIR + '/cdsreads-summarized.txt')
 clipsim_input_data_pack = relfmt(ERRORANALYSIS_DIR + '/%s-sim.pack')
 clipsim_output_prefix = relfmt(ERRORANALYSIS_DIR + '/%s-permutations-')
 clipsim_output_entropy = relfmt(ERRORANALYSIS_DIR + '/%s-permutations-entropy.simout.gz')
+
+clipsim_real_nonzero_positions = relfmt(ERRORANALYSIS_DIR + '/%s-nonzero.posrcnt.gz')
+clipsim_real_del_scores = relfmt(ERRORANALYSIS_DIR + '/%s-del.alnprof.gz')
+clipsim_real_mod_scores = relfmt(ERRORANALYSIS_DIR + '/%s-mod.alnprof.gz')
+clipsim_real_moddel_scores = relfmt(ERRORANALYSIS_DIR + '/%s-moddel.alnprof.gz')
+clipsim_real_entropy_scores = relfmt(ERRORANALYSIS_DIR + '/%s-entropy.alnprof.gz')
 

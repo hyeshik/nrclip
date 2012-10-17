@@ -28,6 +28,7 @@ from ruffus import *
 from rnarry.nrclip import Paths, Options, TranscriptomeAnalysis
 from rnarry.nrclip.PipelineControl import *
 from rnarry.sequtils import get_first_sequence_length
+import os
 
 FASTQ_FORMAT = {
     'illumina1.5': 'fastq-illumina',
@@ -78,11 +79,27 @@ def permutate_clip_alignments(inputfile, outputfile, sample):
             '-r $CROSSFEST_PERMUTATIONS', outputfile)
 
 
+@files(for_each([Paths.fulltag_transcriptomic_besthits_gmap,
+                 Paths.reftranscriptome_sequences],
+                [Paths.clipsim_real_nonzero_positions,
+                 Paths.clipsim_real_del_scores,
+                 Paths.clipsim_real_mod_scores,
+                 Paths.clipsim_real_moddel_scores,
+                 Paths.clipsim_real_entropy_scores],
+                Paths.ALLCLIP_SAMPLES))
+@follows(TranscriptomeAnalysis.resolve_transcriptomic_multihits_gmap)
+def calculate_clip_scores_real(inputfiles, outputfiles, sample):
+    inputs = ' '.join(inputfiles)
+    outputprefix = os.path.commonprefix(outputfiles)
+    runproc('$CLIPSIM_REALDATA_DISTS $inputs $outputprefix', outputfiles)
+
+
 def tasks():
     return [
         count_alignment_errors,
         summarize_error_profile,
         prepare_clip_sim_input,
         permutate_clip_alignments,
+        calculate_clip_scores_real,
     ]
 
