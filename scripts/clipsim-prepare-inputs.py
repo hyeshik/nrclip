@@ -9,7 +9,7 @@ import numpy as np
 import re
 from itertools import groupby
 from rnarry.sequtils import GiantFASTAFile
-from rnarryext import RandomReadCounter, shannon_entropy
+from rnarryext import shannon_entropy
 
 def detect_readcount_type():
     if struct.calcsize('I') != 4:
