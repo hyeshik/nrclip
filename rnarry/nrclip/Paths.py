@@ -279,12 +279,14 @@ rpf_summarized_table = rel(STATISTICS_DIR + '/cdsreads-summarized.txt')
 # CLIP
 
 clipsim_input_data_pack = relfmt(ERRORANALYSIS_DIR + '/%s-sim.pack')
-clipsim_output_prefix = relfmt(ERRORANALYSIS_DIR + '/%s-permutations-')
-clipsim_output_entropy = relfmt(ERRORANALYSIS_DIR + '/%s-permutations-entropy.simout.gz')
+clipsim_permutated_entropy = relfmt(ERRORANALYSIS_DIR + '/%s-entropy.perm.gz')
+clipsim_permutated_del = relfmt(ERRORANALYSIS_DIR + '/%s-del.perm.gz')
+clipsim_permutated_mod = relfmt(ERRORANALYSIS_DIR + '/%s-mod.perm.gz')
+clipsim_permutated_moddel = relfmt(ERRORANALYSIS_DIR + '/%s-moddel.perm.gz')
 
 clipsim_real_nonzero_positions = relfmt(ERRORANALYSIS_DIR + '/%s-nonzero.posrcnt.gz')
-clipsim_real_del_scores = relfmt(ERRORANALYSIS_DIR + '/%s-del.alnprof.gz')
-clipsim_real_mod_scores = relfmt(ERRORANALYSIS_DIR + '/%s-mod.alnprof.gz')
-clipsim_real_moddel_scores = relfmt(ERRORANALYSIS_DIR + '/%s-moddel.alnprof.gz')
-clipsim_real_entropy_scores = relfmt(ERRORANALYSIS_DIR + '/%s-entropy.alnprof.gz')
+clipsim_real_del_scores = relfmt(ERRORANALYSIS_DIR + '/%s-del.real.gz')
+clipsim_real_mod_scores = relfmt(ERRORANALYSIS_DIR + '/%s-mod.real.gz')
+clipsim_real_moddel_scores = relfmt(ERRORANALYSIS_DIR + '/%s-moddel.real.gz')
+clipsim_real_entropy_scores = relfmt(ERRORANALYSIS_DIR + '/%s-entropy.real.gz')
 

@@ -694,7 +694,7 @@ write_permutation_result(const char *prefix, const char *method,
     struct clipstats *arrptr, *arrend;
     gzFile outf;
 
-    snprintf(filename, PATH_MAX, "%s%s.simout.gz", prefix, method);
+    snprintf(filename, PATH_MAX, "%s%s.perm.gz", prefix, method);
     outf = gzopen(filename, "w7");
     if (outf == NULL)
         return -1;

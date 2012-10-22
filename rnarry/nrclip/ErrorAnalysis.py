@@ -69,14 +69,18 @@ def prepare_clip_sim_input(inputfiles, outputfile, sample):
     runproc('$CLIPSIM_PREPARE_INPUTS $inputs $outputfile', outputfile)
 
 
-@files(for_each(Paths.clipsim_input_data_pack, Paths.clipsim_output_entropy,
+@files(for_each(Paths.clipsim_input_data_pack,
+                [Paths.clipsim_permutated_del,
+                 Paths.clipsim_permutated_mod,
+                 Paths.clipsim_permutated_moddel,
+                 Paths.clipsim_permutated_entropy],
                 Paths.ALLCLIP_SAMPLES))
 @follows(prepare_clip_sim_input)
 @jobs_limit(1, 'exclusive')
-def permutate_clip_alignments(inputfile, outputfile, sample):
-    outputprefix = Paths.clipsim_output_prefix(sample)
+def permutate_clip_alignments(inputfile, outputfiles, sample):
+    outputprefix = os.path.commonprefix(outputfiles)
     runproc('$CROSSFEST -i $inputfile -o $outputprefix -t $NUM_THREADS '
-            '-r $CROSSFEST_PERMUTATIONS', outputfile)
+            '-r $CROSSFEST_PERMUTATIONS', outputfiles)
 
 
 @files(for_each([Paths.fulltag_transcriptomic_besthits_gmap,

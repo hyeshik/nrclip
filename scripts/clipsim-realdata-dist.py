@@ -128,10 +128,10 @@ def probe_reads(spans, greffile, nonzeroout, distout):
                 print >> nonzeroout, spname, pos, refbase, kcnt, ' '.join(
                  map(str, simcnt)), del_ratio, mod_ratio, moddel_ratio, sentropy
 
-            print >> outd, kcnt, refbase, del_ratio
-            print >> outm, kcnt, refbase, mod_ratio
-            print >> outmd, kcnt, refbase, moddel_ratio
-            print >> oute, kcnt, refbase, sentropy
+            print >> outd, kcnt, refbase, '%.6f' % del_ratio
+            print >> outm, kcnt, refbase, '%.6f' % mod_ratio
+            print >> outmd, kcnt, refbase, '%.6f' % moddel_ratio
+            print >> oute, kcnt, refbase, '%.6f' % sentropy
 
 
 if __name__ == '__main__':
@@ -150,10 +150,10 @@ if __name__ == '__main__':
 
     nonzeroout = gzip.open(outputprefix + 'nonzero.posrcnt.gz', 'w')
     distout = {
-        'D': opensortedout(outputprefix + 'del.alnprof.gz'),
-        'M': opensortedout(outputprefix + 'mod.alnprof.gz'),
-        'MD': opensortedout(outputprefix + 'moddel.alnprof.gz'),
-        'E': opensortedout(outputprefix + 'entropy.alnprof.gz'),
+        'D': opensortedout(outputprefix + 'del.real.gz'),
+        'M': opensortedout(outputprefix + 'mod.real.gz'),
+        'MD': opensortedout(outputprefix + 'moddel.real.gz'),
+        'E': opensortedout(outputprefix + 'entropy.real.gz'),
     }
 
     spans = scan_gmap(mappingf)
