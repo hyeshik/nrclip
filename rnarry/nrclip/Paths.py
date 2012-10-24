@@ -97,6 +97,7 @@ GENFASTA_MUTATED_TRANSCRIPTOME = PYTHON + ' scripts/genfasta-mutated-transcripto
 STATS_CLIP_NRREFSEQ_ENRICHED = PYTHON + ' scripts/clip-nrrefseq-enriched.py'
 STATS_READ_CLASS_PROPORTION = PYTHON + ' scripts/stats-read-class-proportion.py'
 STATS_READ_CLASS_ADD_FILTERED = 'sh scripts/stats-classstat-addprealns.sh'
+STATS_LENGTH_DIST = PYTHON + ' scripts/stats-lengthdist.py'
 GMAP_ERROR_PROFILE = PYTHON + ' scripts/gmap-error-profile.py'
 SUMMARIZE_ERROR_PROFILE = PYTHON + ' scripts/summarize-error-profile.py'
 TSPACE_COUNT_CDS = PYTHON + ' scripts/tspace-count-cds.py'
@@ -266,6 +267,7 @@ error_profile_summarized = relfmt(ERRORANALYSIS_DIR + '/%s-error_profile.pickle'
 
 clip_enrichment_summary = rel(STATISTICS_DIR + '/clip-refseq-enrichment.csv')
 total_read_class_stats = relfmt(STATISTICS_DIR + '/classprop.%s.csv')
+read_length_stats = relfmt(STATISTICS_DIR + '/readlength.%s.csv')
 
 
 # ==================

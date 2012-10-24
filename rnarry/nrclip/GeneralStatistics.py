@@ -28,7 +28,7 @@ from ruffus import *
 import os
 from rnarry.nrclip import (
     Paths, Options, DerivedDatabaseBuilding, SequenceAnnotation,
-    ContaminantFilter)
+    ContaminantFilter, SequenceProcessing)
 from rnarry.nrclip.PipelineControl import *
 
 
@@ -62,8 +62,17 @@ def total_read_classification_statistics(inputfiles, outputfile, sample):
                 "> $outputfile", outputfile)
 
 
+@files(for_each(Paths.fulltag_collapsed_reads,
+                Paths.read_length_stats, Options.ALL_SAMPLES))
+@follows(SequenceProcessing.fulltag_collapse)
+def read_length_statistics(inputfile, outputfile, sample):
+    runproc("""
+        $STATS_LENGTH_DIST $inputfile > $outputfile""", outputfile)
+
+
 def tasks():
     return [
         clip_refseq_enrichment_statistics,
         total_read_classification_statistics,
+        read_length_statistics,
     ]
