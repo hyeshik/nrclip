@@ -1,3 +1,5 @@
+from __future__ import division
+
 """
 This is a slightly-modified version of James Taylor's bx.binned_array.
 It might have a minor problem on caching in get_ranges operation in
@@ -64,8 +66,6 @@ pseudo-random acccess.
 (does not require keeping all data in memory). `FileBinnedArray` provides
 read only access to an on disk binned array. 
 """
-
-from __future__ import division
 
 import math
 
