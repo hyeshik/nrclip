@@ -790,6 +790,7 @@ main(int argc, char *argv[])
     int nthreads, i, c, iterations;
     uint64_t coverage_gb=500;
     size_t errorprofile_blk_size=0;
+    uint64_t totalbases;
 
     input_path = output_prefix = NULL;
     nthreads = 8;
@@ -840,20 +841,16 @@ main(int argc, char *argv[])
     if (error_profile == NULL)
         goto onError;
 
-    {
-        uint64_t totalbases;
+    totalbases = get_total_read_bases(error_profile);
+    adjust_threads_for_memory(totalbases, &nthreads);
+    iterations = (int)ceil(coverage_gb * 1000000000. / totalbases);
+    printf("Depth of single run: %lu\n", totalbases);
+    printf("Will permutate runs for %d iterations to generate "
+        "%.2f Gb.\n\n", iterations, totalbases / 1000000000. * iterations);
 
-        totalbases = get_total_read_bases(error_profile);
-        adjust_threads_for_memory(totalbases, &nthreads);
-        iterations = (int)ceil(coverage_gb * 1000000000. / totalbases);
-        printf("Depth of single run: %lu\n", totalbases);
-        printf("Will permutate runs for %d iterations to generate "
-            "%.2f Gb.\n\n", iterations, totalbases / 1000000000. * iterations);
-
-        if (iterations < 1 || iterations > 10000) {
-            fprintf(stderr, "Number of iterations is determined abnormally.\n");
-            return 1;
-        }
+    if (iterations < 1 || iterations > 10000) {
+        fprintf(stderr, "Number of iterations is determined abnormally.\n");
+        return 1;
     }
 
     jobcounter.total = iterations;
@@ -961,6 +958,8 @@ main(int argc, char *argv[])
             LOCK_AND_UPDATE_STATUS(&workers[i], WORKER_STATUS_FINISHED);
         }
 
+        printf("\n\nWriting out permutation result files.\n");
+
         write_permutation_result(output_prefix, "del", result_del);
         write_permutation_result(output_prefix, "mod", result_mod);
         write_permutation_result(output_prefix, "moddel", result_moddel);
@@ -982,8 +981,9 @@ main(int argc, char *argv[])
             gettimeofday(&tv, NULL);
             elapsed_time = TIMEVAL_DIFF(jobcounter.started, tv);
             printf("\n\n%d iterations successfully finished. "
-                   "(%.2lf itr/hr)\n",
-                   iterations, 3600. / elapsed_time * iterations);
+                   "(%.1lf bases/sec)\n",
+                   iterations,
+                   ((double)totalbases) * iterations / elapsed_time);
         }
     }
 

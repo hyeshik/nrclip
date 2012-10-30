@@ -145,7 +145,7 @@ if __name__ == '__main__':
     greffile = GiantFASTAFile(greffile)
 
     def opensortedout(fname):
-        return os.popen("sort -k1,1n -k2,2 -k3,3nr | uniq -c | "
+        return os.popen("sort -k1,1n -k2,2 -k3,3r | uniq -c | "
                 "awk '{ print $2, $3, $4, $1; }' | gzip - >%s" % fname, 'w')
 
     nonzeroout = gzip.open(outputprefix + 'nonzero.posrcnt.gz', 'w')
