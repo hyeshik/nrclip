@@ -981,9 +981,9 @@ main(int argc, char *argv[])
             gettimeofday(&tv, NULL);
             elapsed_time = TIMEVAL_DIFF(jobcounter.started, tv);
             printf("\n\n%d iterations successfully finished. "
-                   "(%.1lf bases/sec)\n",
+                   "(%.3lf megabases/sec)\n",
                    iterations,
-                   ((double)totalbases) * iterations / elapsed_time);
+                   totalbases / 1000000. * iterations / elapsed_time);
         }
     }
 
