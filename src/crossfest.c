@@ -156,7 +156,7 @@ usage(const char *execpath)
     printf("  -i FILE\tinput data pack file (required)\n");
     printf("  -o FILE\toutput file prefix (required)\n");
     printf("  -t N\t\tnumber of worker threads (default: 8)\n");
-    printf("  -r N\t\tnumber of permutations (default: 1000)\n");
+    printf("  -d N\t\tminimum depth of simulated reads in Gb (default: 500)\n");
 }
 
 static void
@@ -710,6 +710,20 @@ write_permutation_result(const char *prefix, const char *method,
     return 0;
 }
 
+static uint64_t
+get_total_read_bases(ERROR_PROFILE *prof)
+{
+    uint64_t totalbases=0;
+    uint32_t pos, base1, base2;
+
+    for (pos = 0; pos < prof->readlength; pos++)
+        for (base1 = 0; base1 < NUMBASES; base1++)
+            for (base2 = 0; base2 < NUMBASES; base2++)
+                totalbases += prof->readdist[pos][base1][base2];
+
+    return totalbases;
+}
+
 #ifdef __gnu_linux__
 static uint64_t
 get_total_memory_size(void)
@@ -738,18 +752,11 @@ get_total_memory_size(void)
 #endif
 
 static void
-adjust_threads_for_memory(ERROR_PROFILE *prof, int *nthreads)
+adjust_threads_for_memory(uint64_t totalbases, int *nthreads)
 {
 #ifdef __gnu_linux__
-    uint64_t totalbases, memsize;
-    uint32_t pos, base1, base2;
+    uint64_t memsize;
     int recommended_threads;
-
-    totalbases = 0;
-    for (pos = 0; pos < prof->readlength; pos++)
-        for (base1 = 0; base1 < NUMBASES; base1++)
-            for (base2 = 0; base2 < NUMBASES; base2++)
-                totalbases += prof->readdist[pos][base1][base2];
 
     memsize = get_total_memory_size();
     if (memsize == 0) {
@@ -757,7 +764,7 @@ adjust_threads_for_memory(ERROR_PROFILE *prof, int *nthreads)
         return;
     }
 
-    recommended_threads = (int)(memsize / 1.5 / totalbases);
+    recommended_threads = (int)(memsize / 1.7 / totalbases);
     if (recommended_threads < 1) {
         printf("Memory is desperately insufficient for this data set. "
                "The program proceeds to run, however it will extremely slow "
@@ -780,15 +787,15 @@ main(int argc, char *argv[])
     const char *input_path, *output_prefix;
     ERROR_PROFILE *error_profile=NULL;
     JOB_COUNTER jobcounter;
-    int nthreads, i, c;
-    int iterations;
+    int nthreads, i, c, iterations;
+    uint64_t coverage_gb=500;
     size_t errorprofile_blk_size=0;
 
     input_path = output_prefix = NULL;
     nthreads = 8;
     iterations = 1000;
 
-    while ((c = getopt(argc, argv, "i:m:o:t:r:h")) != -1)
+    while ((c = getopt(argc, argv, "i:m:o:t:d:h")) != -1)
         switch (c) {
         case 'i':
             input_path = optarg;
@@ -799,8 +806,8 @@ main(int argc, char *argv[])
         case 'o':
             output_prefix = optarg;
             break;
-        case 'r':
-            iterations = atoi(optarg);
+        case 'd':
+            coverage_gb = atol(optarg);
             break;
         default:
             usage(argv[0]);
@@ -818,8 +825,8 @@ main(int argc, char *argv[])
         return 1;
     }
 
-    if (iterations < 1) {
-        fprintf(stderr, "Number of iterations invalid (%d).\n", iterations);
+    if (coverage_gb < 1 || coverage_gb > 100000) {
+        fprintf(stderr, "Minimum depth invalid (%lu).\n", coverage_gb);
         return 1;
     }
 
@@ -833,7 +840,21 @@ main(int argc, char *argv[])
     if (error_profile == NULL)
         goto onError;
 
-    adjust_threads_for_memory(error_profile, &nthreads);
+    {
+        uint64_t totalbases;
+
+        totalbases = get_total_read_bases(error_profile);
+        adjust_threads_for_memory(totalbases, &nthreads);
+        iterations = (int)ceil(coverage_gb * 1000000000. / totalbases);
+        printf("Depth of single run: %lu\n", totalbases);
+        printf("Will permutate runs for %d iterations to generate "
+            "%.2f Gb.\n\n", iterations, totalbases / 1000000000. * iterations);
+
+        if (iterations < 1 || iterations > 10000) {
+            fprintf(stderr, "Number of iterations is determined abnormally.\n");
+            return 1;
+        }
+    }
 
     jobcounter.total = iterations;
     jobcounter.done = jobcounter.queued = 0;

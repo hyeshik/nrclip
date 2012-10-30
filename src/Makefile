@@ -1,4 +1,5 @@
-CC=		gcc
+CC=		clang
+#CC=		gcc
 SFMT_CFLAGS=	-O3 -finline-functions -fomit-frame-pointer -DNDEBUG \
 		-fno-strict-aliasing --param max-inline-insns-single=1800 \
 		-Wmissing-prototypes -Wall  -std=c99 -DSFMT_MEXP=19937

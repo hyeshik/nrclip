@@ -80,7 +80,7 @@ def prepare_clip_sim_input(inputfiles, outputfile, sample):
 def permutate_clip_alignments(inputfile, outputfiles, sample):
     outputprefix = os.path.commonprefix(outputfiles)
     runproc('$CROSSFEST -i $inputfile -o $outputprefix -t $NUM_THREADS '
-            '-r $CROSSFEST_PERMUTATIONS', outputfiles)
+            '-d $CROSSFEST_MINIMUM_COVERAGE', outputfiles)
 
 
 @files(for_each([Paths.fulltag_transcriptomic_besthits_gmap,
