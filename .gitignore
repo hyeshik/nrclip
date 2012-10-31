@@ -38,7 +38,6 @@ derived/*
 prealns/*
 tmp/*
 genomealn/*
-flowchart.*
 stats
 transcriptomealn
 erroranalysis

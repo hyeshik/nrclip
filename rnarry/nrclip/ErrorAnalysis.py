@@ -28,6 +28,7 @@ from ruffus import *
 from rnarry.nrclip import Paths, Options, TranscriptomeAnalysis
 from rnarry.nrclip.PipelineControl import *
 from rnarry.sequtils import get_first_sequence_length
+from itertools import chain
 import os
 
 FASTQ_FORMAT = {
@@ -98,18 +99,16 @@ def calculate_clip_scores_real(inputfiles, outputfiles, sample):
     runproc('$CLIPSIM_REALDATA_DISTS $inputs $outputprefix', outputfiles)
 
 
-for method in Paths.MUTATION_RATE_METHODS:
-    exec("""
-@files(for_each([Paths.clipsim_permutated_%(method)s,
-                 Paths.clipsim_real_%(method)s_scores],
-                Paths.clipsim_%(method)s_cutoffs_by_fdr,
-                Paths.ALLCLIP_SAMPLES))
+@files(list(chain(*[for_each([Paths.clipsim_files_by_method[method][0],
+                              Paths.clipsim_files_by_method[method][1]],
+                             Paths.clipsim_files_by_method[method][2],
+                             Paths.ALLCLIP_SAMPLES)
+                    for method in Paths.MUTATION_RATE_METHODS])))
 @follows(permutate_clip_alignments)
 @follows(calculate_clip_scores_real)
-def calculate_cutoffs_by_fdr_%(method)s(inputfiles, outputfile, sample):
+def calculate_cutoffs_by_fdr(inputfiles, outputfile, sample):
     inputprefix = os.path.commonprefix(inputfiles)
     runproc('$CLIPSIM_CALC_FDR_CURVE $inputprefix $outputfile', outputfile)
-""".strip() % {'method': method})
 
 
 def tasks():
@@ -119,9 +118,6 @@ def tasks():
         prepare_clip_sim_input,
         permutate_clip_alignments,
         calculate_clip_scores_real,
-        calculate_cutoffs_by_fdr_del,
-        calculate_cutoffs_by_fdr_mod,
-        calculate_cutoffs_by_fdr_moddel,
-        calculate_cutoffs_by_fdr_entropy,
+        calculate_cutoffs_by_fdr,
     ]
 

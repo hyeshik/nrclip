@@ -301,3 +301,10 @@ clipsim_mod_cutoffs_by_fdr = relfmt(ERRORANALYSIS_DIR + '/%s-mod.cutoffs')
 clipsim_moddel_cutoffs_by_fdr = relfmt(ERRORANALYSIS_DIR + '/%s-moddel.cutoffs')
 clipsim_entropy_cutoffs_by_fdr = relfmt(ERRORANALYSIS_DIR + '/%s-entropy.cutoffs')
 
+clipsim_files_by_method = {
+    'del': (clipsim_permutated_del, clipsim_real_del_scores, clipsim_del_cutoffs_by_fdr),
+    'mod': (clipsim_permutated_mod, clipsim_real_mod_scores, clipsim_mod_cutoffs_by_fdr),
+    'moddel': (clipsim_permutated_moddel, clipsim_real_moddel_scores, clipsim_moddel_cutoffs_by_fdr),
+    'entropy': (clipsim_permutated_entropy, clipsim_real_entropy_scores, clipsim_entropy_cutoffs_by_fdr),
+}
+
