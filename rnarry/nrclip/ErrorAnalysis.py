@@ -98,6 +98,20 @@ def calculate_clip_scores_real(inputfiles, outputfiles, sample):
     runproc('$CLIPSIM_REALDATA_DISTS $inputs $outputprefix', outputfiles)
 
 
+for method in Paths.MUTATION_RATE_METHODS:
+    exec("""
+@files(for_each([Paths.clipsim_permutated_%(method)s,
+                 Paths.clipsim_real_%(method)s_scores],
+                Paths.clipsim_%(method)s_cutoffs_by_fdr,
+                Paths.ALLCLIP_SAMPLES))
+@follows(permutate_clip_alignments)
+@follows(calculate_clip_scores_real)
+def calculate_cutoffs_by_fdr_%(method)s(inputfiles, outputfile, sample):
+    inputprefix = os.path.commonprefix(inputfiles)
+    runproc('$CLIPSIM_CALC_FDR_CURVE $inputprefix $outputfile', outputfile)
+""".strip() % {'method': method})
+
+
 def tasks():
     return [
         count_alignment_errors,
@@ -105,5 +119,9 @@ def tasks():
         prepare_clip_sim_input,
         permutate_clip_alignments,
         calculate_clip_scores_real,
+        calculate_cutoffs_by_fdr_del,
+        calculate_cutoffs_by_fdr_mod,
+        calculate_cutoffs_by_fdr_moddel,
+        calculate_cutoffs_by_fdr_entropy,
     ]
 

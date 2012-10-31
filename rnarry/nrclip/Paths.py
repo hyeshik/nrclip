@@ -37,6 +37,9 @@ def relfmt(path):
     return lambda *v: os.path.join(TOPDIR, path % tuple(v))
 
 
+MUTATION_RATE_METHODS = ['del', 'mod', 'moddel', 'entropy']
+
+
 # =====================
 # External tool aliases
 
@@ -104,7 +107,8 @@ TSPACE_COUNT_CDS = PYTHON + ' scripts/tspace-count-cds.py'
 SUMMARIZE_RPF_COUNTS = PYTHON + ' scripts/summarize-rpf-counts.py'
 CLIPSIM_PREPARE_INPUTS = PYTHON + ' scripts/clipsim-prepare-inputs.py'
 CROSSFEST = 'src/crossfest'
-CLIPSIM_REALDATA_DISTS = PYTHON = ' scripts/clipsim-realdata-dist.py'
+CLIPSIM_REALDATA_DISTS = PYTHON + ' scripts/clipsim-realdata-dist.py'
+CLIPSIM_CALC_FDR_CURVE = PYTHON + ' scripts/clipsim-calc-fdr-curve.py'
 
 
 # =================================
@@ -291,4 +295,9 @@ clipsim_real_del_scores = relfmt(ERRORANALYSIS_DIR + '/%s-del.real.gz')
 clipsim_real_mod_scores = relfmt(ERRORANALYSIS_DIR + '/%s-mod.real.gz')
 clipsim_real_moddel_scores = relfmt(ERRORANALYSIS_DIR + '/%s-moddel.real.gz')
 clipsim_real_entropy_scores = relfmt(ERRORANALYSIS_DIR + '/%s-entropy.real.gz')
+
+clipsim_del_cutoffs_by_fdr = relfmt(ERRORANALYSIS_DIR + '/%s-del.cutoffs')
+clipsim_mod_cutoffs_by_fdr = relfmt(ERRORANALYSIS_DIR + '/%s-mod.cutoffs')
+clipsim_moddel_cutoffs_by_fdr = relfmt(ERRORANALYSIS_DIR + '/%s-moddel.cutoffs')
+clipsim_entropy_cutoffs_by_fdr = relfmt(ERRORANALYSIS_DIR + '/%s-entropy.cutoffs')
 
