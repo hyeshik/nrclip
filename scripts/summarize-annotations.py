@@ -31,7 +31,7 @@ import csv
 PRIORITY = """
 miRNA rRNA tRNA Mt-tRNA snoRNA scRNA srpRNA snRNA RNA ncRNA misc_RNA
 Cis-reg ribozyme RC IRES frameshift_element
-LINE SINE Simple_repeat Low_complexity Satellite DNA LTR ORF UTR3 UTR5
+LINE SINE Simple_repeat Low_complexity Satellite DNA LTR CDS UTR3 UTR5
 intron Other Unknown
 """.split()
 PRIORITYMAP = defaultdict(lambda: len(PRIORITYMAP))
